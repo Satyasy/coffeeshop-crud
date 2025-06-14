@@ -9,50 +9,89 @@ class OrderItem extends Model
 {
     use HasFactory;
 
-    protected $table = 'order_items'; // Eksplisit nama tabel
-    protected $primaryKey = 'item_id';
-    public $incrementing = true;
-    protected $keyType = 'int'; // Sesuai untuk bigint
+    /**
+     * Nama tabel yang digunakan oleh model.
+     *
+     * @var string
+     */
+    protected $table = 'order_items';
 
+    /**
+     * Primary key untuk model.
+     * INI ADALAH PERBAIKAN UTAMA UNTUK ERROR ANDA.
+     *
+     * @var string
+     */
+    protected $primaryKey = 'order_item_id';
+
+    /**
+     * Menunjukkan jika primary key adalah auto-incrementing.
+     *
+     * @var bool
+     */
+    public $incrementing = true;
+
+    /**
+     * Tipe data dari primary key.
+     *
+     * @var string
+     */
+    protected $keyType = 'int';
+
+    /**
+     * Atribut yang dapat diisi secara massal (mass assignable).
+     *
+     * @var array<int, string>
+     */
     protected $fillable = [
         'order_id',
         'menu_id',
         'quantity',
+        'price_at_order', // DITAMBAHKAN: Ini sangat penting agar `create()` berfungsi
         'notes',
-        // Sebaiknya tambahkan 'price_at_order' atau 'unit_price' di sini jika harga menu bisa berubah
-        // dan Anda ingin menyimpan harga saat item dipesan. Jika tidak, Anda akan selalu mengambil harga terbaru dari Menu.
     ];
 
+    /**
+     * Tipe data native untuk atribut.
+     *
+     * @var array
+     */
     protected $casts = [
         'quantity' => 'integer',
-        // 'order_id' => 'integer', // Opsional
-        // 'menu_id' => 'integer', // Opsional
+        'price_at_order' => 'decimal:2',
     ];
 
-    // Relasi ke Order (Induk)
+
+    // --- RELASI ---
+
+    /**
+     * Relasi ke model Order (Induk).
+     */
     public function order()
     {
-        // Foreign key 'order_id' di tabel ini, merujuk ke primary key 'order_id' di tabel 'orders'
         return $this->belongsTo(Order::class, 'order_id', 'order_id');
     }
 
-    // Relasi ke Menu (Produk yang dipesan)
+    /**
+     * Relasi ke model Menu (Produk yang dipesan).
+     */
     public function menu()
     {
-        // Foreign key 'menu_id' di tabel ini, merujuk ke primary key 'menu_id' di tabel 'menus'
         return $this->belongsTo(Menu::class, 'menu_id', 'menu_id');
     }
 
-    // Accessor untuk subtotal (opsional, tapi berguna)
-    // public function getSubtotalAttribute()
-    // {
-    //     // Jika Anda menyimpan price_at_order di OrderItem:
-    //     // return $this->quantity * $this->price_at_order;
+    
+    // --- ACCESSOR (Contoh Getter) ---
 
-    //     // Jika Anda mengambil harga dari Menu terkait (harga bisa berubah):
-    //     if ($this->menu) {
-    //         return $this->quantity * $this->menu->price;
-    //     }
-    //     return 0;
-    // }
+    /**
+     * Accessor untuk menghitung subtotal secara dinamis.
+     * Anda bisa memanggilnya di view dengan `$item->subtotal`.
+     *
+     * @return float
+     */
+    public function getSubtotalAttribute(): float
+    {
+        // Menggunakan price_at_order agar subtotal konsisten dengan harga saat pemesanan.
+        return $this->quantity * $this->price_at_order;
+    }
 }

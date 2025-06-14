@@ -27,16 +27,7 @@
                 <div class="col-md-6">
                     <h6 class="m-0 font-weight-bold text-primary">Data Review</h6>
                 </div>
-                <div class="col-md-3">
-                    <select name="order_id" class="form-select form-select-sm">
-                        <option value="">Semua Order</option>
-                        @foreach($orders as $order)
-                            <option value="{{ $order->order_id }}" {{ $currentOrderId == $order->order_id ? 'selected' : '' }}>
-                                Order #{{ $order->order_id }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
+            
                 <div class="col-md-2">
                      <select name="rating" class="form-select form-select-sm">
                         <option value="">Semua Rating</option>

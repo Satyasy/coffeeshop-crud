@@ -1,59 +1,37 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
-use App\Http\Controllers\PageController;
-use App\Http\Controllers\UserController;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Route;
+use App\Models\User;
+
+// Import semua controller yang akan digunakan
+use App\Http\Controllers\PageController; // Asumsi Anda punya PageController
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\OrderItemController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ReviewController;
-use App\Http\Controllers\NotificationController;
-use App\Http\Controllers\DriverController;
-use App\Http\Controllers\DeliveryController;
-use App\Models\User; // Import model User untuk registrasi
-use Illuminate\Support\Facades\Hash; // Import Hash untuk registrasi
+use App\Http\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
 | Web Routes
 |--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
-|
 */
 
 // --- Rute Halaman Publik (Tidak Perlu Login) ---
-Route::get('/', [PageController::class, 'home'])->name('home');
-Route::get('/about', [PageController::class, 'about'])->name('about');
-Route::get('/menu', [PageController::class, 'menu'])->name('menu');
-Route::get('/services', [PageController::class, 'services'])->name('services');
-Route::get('/blog', [PageController::class, 'blog'])->name('blog');
-Route::get('/contact', [PageController::class, 'contact'])->name('contact');
-
-// Tambahkan rute untuk halaman-halaman lain dari template Cafe Anda
-Route::get('/blog-single', [PageController::class, 'blogSingle'])->name('blog-single');
-Route::get('/cart', [PageController::class, 'cart'])->name('cart');
-Route::get('/checkout', [PageController::class, 'checkout'])->name('checkout');
-Route::get('/shop', [PageController::class, 'shop'])->name('shop');
-Route::get('/product-single', [PageController::class, 'productSingle'])->name('product-single');
+// Ganti ini dengan route ke halaman depan Anda jika ada
+Route::get('/', function () {
+    return view('welcome');
+})->name('home');
 
 
 // --- Rute Autentikasi ---
-
-// Grup ini untuk route yang hanya bisa diakses oleh 'tamu' (user yang belum login)
 Route::middleware('guest')->group(function () {
-    // Menampilkan form login
-    Route::get('/login', function () {
-        return view('auth.login');
-    })->name('login');
-
-    // Memproses login
-    Route::post('/login', function (Request $request) {
+    Route::get('login', fn() => view('auth.login'))->name('login');
+    Route::post('login', function (Request $request) {
         $credentials = $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required'],
@@ -61,68 +39,52 @@ Route::middleware('guest')->group(function () {
 
         if (Auth::attempt($credentials, $request->filled('remember'))) {
             $request->session()->regenerate();
-            // Arahkan ke dashboard setelah login berhasil
-            // Jika Anda punya route 'dashboard', gunakan itu. Jika tidak, users.index juga boleh.
-            return redirect()->intended(route('users.index')); // Asumsi 'users.index' adalah dashboard default
+            // Arahkan ke halaman utama admin setelah login
+            return redirect()->intended(route('users.index'));
         }
 
-        return back()->withErrors([
-            'email' => 'The provided credentials do not match our records.',
-        ])->onlyInput('email');
+        return back()->withErrors(['email' => 'The provided credentials do not match our records.'])->onlyInput('email');
     });
 
-    // Menampilkan form registrasi
-    Route::get('/register', function () {
-        return view('auth.register');
-    })->name('register');
-
-    // Memproses registrasi
-    Route::post('/register', function (Request $request) {
+    Route::get('register', fn() => view('auth.register'))->name('register');
+    Route::post('register', function (Request $request) {
         $request->validate([
-            'name' => ['required', 'string', 'max:191'],
-            'email' => ['required', 'string', 'email', 'max:191', 'unique:users,email'],
-            'phone' => ['nullable', 'string', 'max:20'],
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'address' => ['nullable', 'string'],
         ]);
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'phone' => $request->phone,
             'password' => Hash::make($request->password),
-            'address' => $request->address,
+            'role' => 'customer',
         ]);
 
         Auth::login($user);
-
-        return redirect(route('home'))->with('success', 'Registrasi berhasil! Selamat datang.');
-    })->name('register.store');
+        return redirect()->route('home');
+    });
 });
 
-// --- Rute yang Membutuhkan Autentikasi ---
 
-// Grup ini untuk semua route yang hanya bisa diakses oleh user yang sudah login
+// --- Rute Panel Admin (Membutuhkan Login) ---
 Route::middleware('auth')->group(function () {
-    // Memproses logout
-    Route::post('/logout', function (Request $request) {
+
+    Route::post('logout', function (Request $request) {
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
         return redirect('/login');
     })->name('logout');
 
-    // Route untuk fitur CRUD aplikasi Anda
-    Route::resource('users', UserController::class)->parameters(['users' => 'user_id']);
-    Route::resource('menus', MenuController::class)->parameters(['menus' => 'menu_id']);
-    Route::resource('orders', OrderController::class)->parameters(['orders' => 'order_id']);
+    // Menggunakan Route::resource standar tanpa prefix nama.
+    // Ini akan membuat nama route seperti 'users.index', 'menus.store', dll.
+    // yang cocok dengan view dan controller yang sudah kita perbaiki.
+    Route::resource('users', UserController::class)->parameters(['users' => 'user']);
+    Route::resource('menus', MenuController::class)->parameters(['menus' => 'menu']);
+    Route::resource('orders', OrderController::class)->parameters(['orders' => 'order']);
     Route::resource('order_items', OrderItemController::class)->parameters(['order_items' => 'order_item']);
     Route::resource('payments', PaymentController::class)->parameters(['payments' => 'payment']);
     Route::resource('reviews', ReviewController::class)->parameters(['reviews' => 'review']);
-    Route::resource('notifications', NotificationController::class)->parameters(['notifications' => 'notification']);
-    Route::resource('drivers', DriverController::class)->parameters(['drivers' => 'driver']);
-    Route::resource('deliveries', DeliveryController::class)->parameters(['deliveries' => 'delivery']);
 
-    // Contoh route dashboard jika ada
-    // Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 });
