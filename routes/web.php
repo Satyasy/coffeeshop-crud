@@ -10,49 +10,33 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\OrderItemController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ReviewController;
-use App\Http\Controllers\NotificationController;
-use App\Http\Controllers\DriverController;
-use App\Http\Controllers\DeliveryController;
-use App\Models\User; // Import model User untuk registrasi
-use Illuminate\Support\Facades\Hash; // Import Hash untuk registrasi
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 
 /*
 |--------------------------------------------------------------------------
 | Web Routes
 |--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
-|
 */
 
-// --- Rute Halaman Publik (Tidak Perlu Login) ---
+// --- Rute Halaman Publik (Bisa diakses siapa saja) ---
 Route::get('/', [PageController::class, 'home'])->name('home');
 Route::get('/about', [PageController::class, 'about'])->name('about');
 Route::get('/menu', [PageController::class, 'menu'])->name('menu');
 Route::get('/services', [PageController::class, 'services'])->name('services');
 Route::get('/blog', [PageController::class, 'blog'])->name('blog');
 Route::get('/contact', [PageController::class, 'contact'])->name('contact');
+// Tambahkan rute publik lain jika ada, misal:
+// Route::get('/blog-single', [PageController::class, 'blogSingle'])->name('blog-single');
 
-// Tambahkan rute untuk halaman-halaman lain dari template Cafe Anda
-Route::get('/blog-single', [PageController::class, 'blogSingle'])->name('blog-single');
-Route::get('/cart', [PageController::class, 'cart'])->name('cart');
-Route::get('/checkout', [PageController::class, 'checkout'])->name('checkout');
-Route::get('/shop', [PageController::class, 'shop'])->name('shop');
-Route::get('/product-single', [PageController::class, 'productSingle'])->name('product-single');
-
-
-// --- Rute Autentikasi ---
-
-// Grup ini untuk route yang hanya bisa diakses oleh 'tamu' (user yang belum login)
+// --- Rute Autentikasi untuk Pengunjung (Guest) ---
 Route::middleware('guest')->group(function () {
-    // Menampilkan form login
+    // Form Login
     Route::get('/login', function () {
         return view('auth.login');
     })->name('login');
 
-    // Memproses login
+    // Proses Login
     Route::post('/login', function (Request $request) {
         $credentials = $request->validate([
             'email' => ['required', 'email'],
@@ -61,22 +45,23 @@ Route::middleware('guest')->group(function () {
 
         if (Auth::attempt($credentials, $request->filled('remember'))) {
             $request->session()->regenerate();
-            // Arahkan ke dashboard setelah login berhasil
-            // Jika Anda punya route 'dashboard', gunakan itu. Jika tidak, users.index juga boleh.
-            return redirect()->intended(route('users.index')); // Asumsi 'users.index' adalah dashboard default
+            $user = Auth::user();
+
+            if ($user->role === 'admin' || $user->role === 'cashier') {
+                return redirect()->intended(route('admin.dashboard'));
+            }
+            return redirect()->intended(route('home'));
         }
 
-        return back()->withErrors([
-            'email' => 'The provided credentials do not match our records.',
-        ])->onlyInput('email');
+        return back()->withErrors(['email' => 'The provided credentials do not match our records.'])->onlyInput('email');
     });
 
-    // Menampilkan form registrasi
+    // Form Registrasi
     Route::get('/register', function () {
         return view('auth.register');
     })->name('register');
 
-    // Memproses registrasi
+    // Proses Registrasi
     Route::post('/register', function (Request $request) {
         $request->validate([
             'name' => ['required', 'string', 'max:191'],
@@ -92,19 +77,17 @@ Route::middleware('guest')->group(function () {
             'phone' => $request->phone,
             'password' => Hash::make($request->password),
             'address' => $request->address,
+            'role' => 'customer', // Default role
         ]);
 
         Auth::login($user);
-
-        return redirect(route('home'))->with('success', 'Registrasi berhasil! Selamat datang.');
-    })->name('register.store');
+        return redirect(route('home'))->with('success', 'Registration successful! Welcome, ' . $user->name);
+    });
 });
 
-// --- Rute yang Membutuhkan Autentikasi ---
-
-// Grup ini untuk semua route yang hanya bisa diakses oleh user yang sudah login
+// --- Rute yang Memerlukan Login ---
 Route::middleware('auth')->group(function () {
-    // Memproses logout
+    // Proses Logout
     Route::post('/logout', function (Request $request) {
         Auth::logout();
         $request->session()->invalidate();
@@ -112,17 +95,39 @@ Route::middleware('auth')->group(function () {
         return redirect('/login');
     })->name('logout');
 
-    // Route untuk fitur CRUD aplikasi Anda
-    Route::resource('users', UserController::class)->parameters(['users' => 'user_id']);
-    Route::resource('menus', MenuController::class)->parameters(['menus' => 'menu_id']);
-    Route::resource('orders', OrderController::class)->parameters(['orders' => 'order_id']);
-    Route::resource('order_items', OrderItemController::class)->parameters(['order_items' => 'order_item']);
-    Route::resource('payments', PaymentController::class)->parameters(['payments' => 'payment']);
-    Route::resource('reviews', ReviewController::class)->parameters(['reviews' => 'review']);
-    Route::resource('notifications', NotificationController::class)->parameters(['notifications' => 'notification']);
-    Route::resource('drivers', DriverController::class)->parameters(['drivers' => 'driver']);
-    Route::resource('deliveries', DeliveryController::class)->parameters(['deliveries' => 'delivery']);
+    // --- GRUP ADMIN (Admin & Kasir) ---
+    Route::middleware('role:admin,cashier')->prefix('admin')->name('admin.')->group(function () {
 
-    // Contoh route dashboard jika ada
-    // Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+        // DIPERBARUI: Tambahkan route ini untuk redirect /admin ke dashboard
+        Route::get('/', function () {
+            return redirect()->route('admin.dashboard');
+        });
+
+        Route::get('/dashboard', function () {
+            // Logika untuk dashboard Anda
+            return view('admin.dashboard'); // Pastikan Anda punya view ini
+        })->name('dashboard');
+
+        // ... sisa resource route Anda ...
+        Route::resource('users', UserController::class);
+        Route::resource('menus', MenuController::class);
+        Route::resource('orders', OrderController::class);
+        Route::resource('order-items', OrderItemController::class);
+        Route::resource('payments', PaymentController::class);
+        Route::resource('reviews', ReviewController::class);
+    });
+
+    // --- GRUP ADMIN (Admin & Kasir) ---
+    Route::middleware('role:admin,cashier')->prefix('admin')->name('admin.')->group(function () {
+
+        // Redirect '/admin' ke dashboard admin
+        Route::get('/', function () {
+            return redirect()->route('admin.dashboard');
+        });
+
+        // DIPERBARUI: Menggunakan DashboardController
+        Route::get('/dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
+
+        // ... sisa resource route Anda ...
+    });
 });

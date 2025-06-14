@@ -1,87 +1,103 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-
     <title>@yield('title', 'Admin Panel') - {{ config('app.name', 'Laravel') }}</title>
 
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link rel="stylesheet" href="{{ asset('css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/open-iconic-bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
 
-    <!-- Font Awesome (untuk ikon) -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-
-    <!-- Custom CSS (jika ada) -->
     <style>
+        :root {
+            --sidebar-bg: #212529;
+            /* Dark */
+            --sidebar-text: rgba(255, 255, 255, 0.7);
+            --sidebar-text-hover: #ffffff;
+            --sidebar-active-bg: #c49b63;
+            /* Warna aksen dari template */
+            --content-bg: #f8f9fa;
+            /* Light Gray */
+            --card-border: #dee2e6;
+            --card-bg: #ffffff;
+        }
+
         body {
-            font-family: 'Figtree', sans-serif;
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--content-bg);
         }
-        .sidebar {
-            position: fixed;
-            top: 0;
-            bottom: 0;
-            left: 0;
-            z-index: 100;
-            padding: 48px 0 0; /* Padding for top navbar */
-            box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
-            width: 240px; /* Lebar sidebar */
-            background-color: #f8f9fa; /* Warna sidebar */
+
+        .admin-wrapper {
+            display: flex;
+            min-height: 100vh;
         }
+
         .main-content {
-            margin-left: 240px; /* Sama dengan lebar sidebar */
-            padding: 20px;
+            flex-grow: 1;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
         }
-        .navbar-brand {
-            padding-top: .75rem;
-            padding-bottom: .75rem;
-            font-size: 1rem;
-            background-color: rgba(0, 0, 0, .25);
-            box-shadow: inset -1px 0 0 rgba(0, 0, 0, .25);
+
+        .content-header {
+            margin-bottom: 2rem;
         }
-        .nav-link {
-            color: #333;
+
+        .card {
+            border: 1px solid var(--card-border);
+            border-radius: 0.5rem;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
         }
-        .nav-link.active {
-            color: #0d6efd;
-            font-weight: bold;
+
+        .card-header {
+            background-color: var(--card-bg);
+            border-bottom: 1px solid var(--card-border);
+            font-weight: 600;
         }
-        .nav-link .fa-fw {
-            width: 1.25em;
+
+        .table {
+            margin-bottom: 0;
+        }
+
+        .table thead th {
+            border-bottom-width: 2px;
+            font-weight: 500;
+        }
+
+        .btn-primary {
+            background-color: var(--sidebar-active-bg);
+            border-color: var(--sidebar-active-bg);
+        }
+
+        .btn-primary:hover {
+            background-color: #b38b52;
+            border-color: #b38b52;
+        }
+
+        .alert {
+            border-radius: 0.5rem;
         }
     </style>
 </head>
+
 <body>
-    <div id="app">
+    <div class="admin-wrapper">
         @include('partials.sidebar')
-
         <main class="main-content">
-            <div class="container-fluid">
-                @if (session('success'))
-                    <div class="alert alert-success alert-dismissible fade show" role="alert">
-                        {{ session('success') }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                @endif
-                @if (session('error'))
-                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                        {{ session('error') }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                @endif
-
-                @yield('content')
-            </div>
+            @include('partials.alerts')
+            @yield('content')
         </main>
     </div>
 
-    <!-- Bootstrap JS Bundle -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
-    @stack('scripts') {{-- Untuk script tambahan per halaman --}}
+    <script src="{{ asset('js/jquery.min.js') }}"></script>
+    <script src="{{ asset('js/popper.min.js') }}"></script>
+    <script src="{{ asset('js/bootstrap.min.js') }}"></script>
 </body>
+
 </html>

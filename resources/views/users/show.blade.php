@@ -1,57 +1,55 @@
 @extends('layouts.admin')
 
-@section('title', 'Detail Pengguna: ' . $user->name)
+@section('title', 'Show User')
 
 @section('content')
-<div class="container-fluid">
-    <div class="d-sm-flex align-items-center justify-content-between mb-4"> 
-        <h1 class="h3 mb-0 text-gray-800">Detail Pengguna: {{ $user->name }}</h1>
-        <div>
-            <a href="{{ route('users.edit', $user->user_id) }}" class="btn btn-warning shadow-sm me-2">
-                <i class="fas fa-edit fa-sm text-white-50 me-1"></i> Edit Pengguna
-            </a>
-            <a href="{{ route('users.index') }}" class="btn btn-secondary shadow-sm">
-                <i class="fas fa-arrow-left fa-sm text-white-50 me-1"></i> Kembali ke Daftar
-            </a>
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">{{ $user->name }}</h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <a href="{{ route('admin.users.edit', $user) }}" class="btn btn-warning">Edit</a>
+            <a href="{{ route('admin.users.index') }}" class="btn btn-secondary ml-2">Back to List</a>
         </div>
     </div>
 
-    <div class="card shadow mb-4">
-        <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Informasi Pengguna</h6>
-        </div>
+    <div class="card">
         <div class="card-body">
-            <div class="row">
-                <div class="col-md-6">
-                    <dl class="row">
-                        <dt class="col-sm-4">ID Pengguna:</dt>
-                        <dd class="col-sm-8">{{ $user->user_id }}</dd>
-
-                        <dt class="col-sm-4">Nama Lengkap:</dt>
-                        <dd class="col-sm-8">{{ $user->name }}</dd>
-
-                        <dt class="col-sm-4">Email:</dt>
-                        <dd class="col-sm-8">{{ $user->email }}</dd>
-
-                        <dt class="col-sm-4">Telepon:</dt>
-                        <dd class="col-sm-8">{{ $user->phone ?? '-' }}</dd>
-                    </dl>
-                </div>
-                <div class="col-md-6">
-                    <dl class="row">
-                        <dt class="col-sm-4">Alamat:</dt>
-                        <dd class="col-sm-8">{{ $user->address ?? '-' }}</dd>
-
-                        <dt class="col-sm-4">Dibuat Pada:</dt>
-                        <dd class="col-sm-8">{{ $user->created_at->format('d M Y, H:i:s') }}</dd>
-
-                        <dt class="col-sm-4">Diperbarui Pada:</dt>
-                        <dd class="col-sm-8">{{ $user->updated_at->format('d M Y, H:i:s') }}</dd>
-                    </dl>
-                </div>
-            </div>
-             {{-- Jangan tampilkan password atau remember_token di sini --}}
+            <h5 class="card-title">User Details</h5>
+            <p><strong>ID:</strong> {{ $user->id }}</p>
+            <p><strong>Name:</strong> {{ $user->name }}</p>
+            <p><strong>Email:</strong> {{ $user->email }}</p>
+            <p><strong>Role:</strong> <span
+                    class="badge badge-{{ $user->role == 'admin' ? 'danger' : 'success' }}">{{ ucfirst($user->role) }}</span>
+            </p>
+            <p><strong>Joined At:</strong> {{ $user->created_at->format('d M Y, H:i:s') }}</p>
+            <p><strong>Last Updated:</strong> {{ $user->updated_at->format('d M Y, H:i:s') }}</p>
         </div>
     </div>
-</div>
+
+    <h3 class="mt-4">User's Orders</h3>
+    @if ($user->orders->count() > 0)
+        <div class="table-responsive">
+            <table class="table table-striped table-sm">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Status</th>
+                        <th>Total Price</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($user->orders as $order)
+                        <tr>
+                            <td><a href="{{ route('admin.orders.show', $order) }}">#{{ $order->id }}</a></td>
+                            <td>{{ ucfirst($order->status) }}</td>
+                            <td>Rp {{ number_format($order->total_price, 0, ',', '.') }}</td>
+                            <td>{{ $order->created_at->format('d M Y') }}</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    @else
+        <p>This user has no orders.</p>
+    @endif
 @endsection
