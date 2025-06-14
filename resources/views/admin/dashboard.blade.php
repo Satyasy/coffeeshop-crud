@@ -2,106 +2,9 @@
 
 @section('title', 'Dashboard')
 
-@section('content')
-    <div class="content-header">
-        <h1 class="h2 font-weight-bold">Dashboard</h1>
-        <p class="text-muted">Selamat datang kembali, {{ Auth::user()->name }}!</p>
-    </div>
-
-    <div class="row">
-        <div class="col-md-6 col-lg-3 mb-4">
-            <div class="stat-card h-100">
-                <div class="stat-card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="text-muted font-weight-normal mb-1">Total Pengguna Aktif</h6>
-                            <h3 class="font-weight-bold mb-0">{{ $totalUsers }}</h3>
-                        </div>
-                        <div class="stat-card-icon icon-users">
-                            <span class="oi oi-people"></span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6 col-lg-3 mb-4">
-            <div class="stat-card h-100">
-                <div class="stat-card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="text-muted font-weight-normal mb-1">Total Penjualan</h6>
-                            <h3 class="font-weight-bold mb-0">Rp {{ number_format($totalSales, 0, ',', '.') }}</h3>
-                        </div>
-                        <div class="stat-card-icon icon-sales">
-                            <span class="oi oi-dollar"></span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6 col-lg-3 mb-4">
-            <div class="stat-card h-100">
-                <div class="stat-card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="text-muted font-weight-normal mb-1">Sisa Stok Menu</h6>
-                            <h3 class="font-weight-bold mb-0">{{ $totalStock }} Pcs</h3>
-                        </div>
-                        <div class="stat-card-icon icon-stock">
-                            <span class="oi oi-inbox"></span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6 col-lg-3 mb-4">
-            <div class="stat-card h-100">
-                <div class="stat-card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="text-muted font-weight-normal mb-1">Pembayaran Sukses</h6>
-                            <h3 class="font-weight-bold mb-0">{{ $totalPayments }}</h3>
-                        </div>
-                        <div class="stat-card-icon icon-payments">
-                            <span class="oi oi-task"></span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    Aktivitas Terbaru
-                </div>
-                <div class="card-body">
-                    <p class="text-center text-muted">Grafik penjualan atau daftar pesanan terbaru akan muncul di sini.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-@endsection
-
-
-{{-- Tambahkan CSS ini ke layout admin Anda atau di sini --}}
 @push('styles')
     <style>
-        .stat-card {
-            background-color: #fff;
-            border: 1px solid var(--card-border);
-            border-radius: 0.75rem;
-            box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.05);
-            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
-        }
-
+        /* Styling khusus untuk kartu statistik di dashboard */
         .stat-card-body {
             padding: 1.5rem;
         }
@@ -113,33 +16,72 @@
             width: 50px;
             height: 50px;
             border-radius: 50%;
-            font-size: 1.5rem;
-            color: #fff;
+            font-size: 1.75rem;
+            color: rgba(0, 0, 0, 0.2);
         }
-
-        .icon-users {
-            background-color: #17a2b8;
-        }
-
-        /* Info */
-        .icon-sales {
-            background-color: #28a745;
-        }
-
-        /* Success */
-        .icon-stock {
-            background-color: #ffc107;
-        }
-
-        /* Warning */
-        .icon-payments {
-            background-color: #007bff;
-        }
-
-        /* Primary */
     </style>
 @endpush
 
-{{-- Jika layout Anda belum punya @stack('styles'), tambahkan ini di <head> layout admin: --}}
-{{-- @stack('styles') --}}
-jdo
+@section('content')
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
+    </div>
+
+    <div class="row">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-start border-primary border-4 shadow h-100">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col me-2">
+                            <div class="text-xs fw-bold text-primary text-uppercase mb-1">Total Pengguna</div>
+                            <div class="h5 mb-0 fw-bold">{{ $totalUsers ?? 'N/A' }}</div>
+                        </div>
+                        <div class="col-auto stat-card-icon"><i class="bi bi-people-fill"></i></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-start border-success border-4 shadow h-100">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col me-2">
+                            <div class="text-xs fw-bold text-success text-uppercase mb-1">Total Penjualan</div>
+                            <div class="h5 mb-0 fw-bold">Rp {{ number_format($totalSales ?? 0, 0, ',', '.') }}</div>
+                        </div>
+                        <div class="col-auto stat-card-icon"><i class="bi bi-cash-coin"></i></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-start border-info border-4 shadow h-100">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col me-2">
+                            <div class="text-xs fw-bold text-info text-uppercase mb-1">Sisa Stok</div>
+                            <div class="h5 mb-0 fw-bold">{{ $totalStock ?? 'N/A' }} Pcs</div>
+                        </div>
+                        <div class="col-auto stat-card-icon"><i class="bi bi-box-seam-fill"></i></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-start border-warning border-4 shadow h-100">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col me-2">
+                            <div class="text-xs fw-bold text-warning text-uppercase mb-1">Pembayaran Sukses</div>
+                            <div class="h5 mb-0 fw-bold">{{ $totalPayments ?? 'N/A' }}</div>
+                        </div>
+                        <div class="col-auto stat-card-icon"><i class="bi bi-check2-circle"></i></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+@endsection
