@@ -13,13 +13,10 @@
 
     <style>
         :root {
-            /* Warna Branding Anda */
             --bs-primary: #c49b63;
             --bs-primary-rgb: 196, 155, 99;
-
             --sidebar-bg: #212529;
             --sidebar-width: 260px;
-            --topbar-height: 70px;
             --bs-body-bg: #f4f7fc;
             --bs-body-color: #5a5c69;
         }
@@ -30,40 +27,33 @@
             color: var(--bs-body-color);
         }
 
-        /* Layout Utama */
+        /* DIPERBAIKI: Struktur layout utama */
         .admin-wrapper {
             display: flex;
+            width: 100%;
+            align-items: stretch;
         }
 
-        .sidebar {
-            width: var(--sidebar-width);
-            min-height: 100vh;
-            background-color: var(--sidebar-bg);
-            transition: margin-left 0.3s ease-in-out;
+        #sidebar {
+            min-width: var(--sidebar-width);
+            max-width: var(--sidebar-width);
+            background: var(--sidebar-bg);
+            color: #fff;
+            transition: all 0.3s;
         }
 
-        .main-content {
-            flex-grow: 1;
-            padding-left: var(--sidebar-width);
-            transition: padding-left 0.3s ease-in-out;
+        #sidebar.toggled {
+            margin-left: calc(-1 * var(--sidebar-width));
         }
 
-        .topbar {
-            height: var(--topbar-height);
-            background-color: #fff;
-            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
-            padding: 0 2rem;
-            position: sticky;
-            top: 0;
-            z-index: 1020;
+        #content-wrapper {
+            width: 100%;
+            padding: 0;
+            transition: all 0.3s;
         }
 
-        .content-fluid {
-            padding: 2rem;
-        }
-
-        /* Sidebar Styling */
-        .sidebar .nav-link {
+        /* Styling Sidebar */
+        #sidebar .nav-link {
             color: rgba(255, 255, 255, 0.7);
             font-weight: 500;
             padding: 0.8rem 1.5rem;
@@ -71,17 +61,17 @@
             align-items: center;
         }
 
-        .sidebar .nav-link .bi {
+        #sidebar .nav-link .bi {
             margin-right: 1rem;
             font-size: 1.1rem;
         }
 
-        .sidebar .nav-link:hover {
+        #sidebar .nav-link:hover {
             color: #fff;
             background-color: rgba(255, 255, 255, 0.05);
         }
 
-        .sidebar .nav-link.active {
+        #sidebar .nav-link.active {
             color: #fff;
             background-color: var(--bs-primary);
         }
@@ -94,16 +84,16 @@
             text-align: center;
         }
 
-        /* Tombol & Komponen */
-        .btn-primary {
-            background-color: var(--bs-primary);
-            border-color: var(--bs-primary);
+        /* Styling Topbar & Konten */
+        .topbar {
+            height: 70px;
+            background-color: #fff;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+            padding: 0 2rem;
         }
 
-        .btn-primary:hover {
-            opacity: 0.9;
-            background-color: var(--bs-primary);
-            border-color: var(--bs-primary);
+        .container-fluid {
+            padding: 2rem;
         }
 
         .card {
@@ -118,49 +108,46 @@
             border-bottom: 1px solid #e3e6f0;
             padding: 1rem 1.5rem;
             font-weight: 600;
-            font-size: 1.1rem;
         }
 
-        /* Responsive Toggle */
-        #sidebarToggle {
-            border: none;
-            background: transparent;
-            font-size: 1.5rem;
+        .btn-primary {
+            background-color: var(--bs-primary);
+            border-color: var(--bs-primary);
         }
 
-        body.sidebar-toggled .sidebar {
-            margin-left: calc(-1 * var(--sidebar-width));
-        }
-
-        body.sidebar-toggled .main-content {
-            padding-left: 0;
+        .btn-primary:hover {
+            opacity: 0.9;
         }
     </style>
     @stack('styles')
 </head>
 
-<body id="page-top">
+<body>
     <div class="admin-wrapper">
-        @include('partials.sidebar') <div class="main-content d-flex flex-column" id="content-wrapper">
+        @include('partials.sidebar') <div id="content-wrapper" class="d-flex flex-column">
             <main id="content">
                 <nav class="topbar d-flex justify-content-between align-items-center">
-                    <button id="sidebarToggle" class="btn text-secondary"><i class="bi bi-list"></i></button>
+                    <button id="sidebarToggle" class="btn text-secondary"><i class="bi bi-list fs-4"></i></button>
                 </nav>
 
-                <div class="container-fluid content-fluid">
-                    @include('partials.alerts') @yield('content') </div>
+                <div class="container-fluid">
+                    @include('partials.alerts')
+                    @yield('content')
+                </div>
             </main>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <script>
         // Logika untuk toggle sidebar
         const sidebarToggle = document.getElementById('sidebarToggle');
         if (sidebarToggle) {
             sidebarToggle.addEventListener('click', event => {
                 event.preventDefault();
-                document.body.classList.toggle('sidebar-toggled');
+                document.getElementById('sidebar').classList.toggle('toggled');
             });
         }
     </script>
