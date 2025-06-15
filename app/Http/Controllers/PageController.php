@@ -3,116 +3,49 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Menu; // JANGAN LUPA IMPORT MODEL MENU
 
 class PageController extends Controller
 {
-    /**
-     * Menampilkan halaman beranda.
-     *
-     * @return \Illuminate\View\View
-     */
     public function home()
     {
-        return view('pages.index');
+        // ... (logika untuk halaman home)
+        return view('pages.index'); // Asumsi nama view
     }
 
-    /**
-     * Menampilkan halaman About Us.
-     *
-     * @return \Illuminate\View\View
-     */
     public function about()
     {
-        return view('pages.about');
+        // ... (logika untuk halaman about)
+        return view('pages.about'); // Asumsi nama view
     }
 
     /**
-     * Menampilkan halaman Menu.
-     *
-     * @return \Illuminate\View\View
+     * Menampilkan halaman menu publik dengan data dari database.
      */
     public function menu()
     {
-        return view('pages.menu');
+        // Ambil semua menu yang tersedia dan kelompokkan berdasarkan kategori
+        $menus = Menu::where('is_available', true)
+                     ->get()
+                     ->groupBy('category'); // Ini akan mengelompokkan menu
+
+        // Kirim data menu yang sudah dikelompokkan ke view
+        return view('pages.menu', compact('menus'));
     }
 
-    /**
-     * Menampilkan halaman Services.
-     *
-     * @return \Illuminate\View\View
-     */
+    // ... method lain untuk halaman publik ...
     public function services()
     {
         return view('pages.services');
     }
 
-    /**
-     * Menampilkan halaman Blog.
-     *
-     * @return \Illuminate\View\View
-     */
     public function blog()
     {
         return view('pages.blog');
     }
-
-    /**
-     * Menampilkan halaman Contact.
-     *
-     * @return \Illuminate\View\View
-     */
+    
     public function contact()
     {
         return view('pages.contact');
-    }
-
-    /**
-     * Menampilkan halaman detail artikel blog.
-     *
-     * @return \Illuminate\View\View
-     */
-    public function blogSingle()
-    {
-        return view('pages.blog-single');
-    }
-
-    /**
-     * Menampilkan halaman keranjang belanja.
-     *
-     * @return \Illuminate\View\View
-     */
-    public function cart()
-    {
-        return view('pages.cart');
-    }
-
-    /**
-     * Menampilkan halaman checkout.
-     *
-     * @return \Illuminate\View\View
-     */
-    public function checkout()
-    {
-        return view('pages.checkout');
-    }
-
-    /**
-     * Menampilkan halaman toko/produk.
-     *
-     * @return \Illuminate\View\View
-     */
-    public function shop()
-    {
-        return view('pages.shop');
-    }
-
-    /**
-     * Menampilkan halaman detail produk tunggal.
-     *
-     * @return \Illuminate\View\View
-     */
-    public function productSingle()
-    {
-        return view('pages.product-single');
     }
 }
