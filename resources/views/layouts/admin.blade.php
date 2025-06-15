@@ -6,98 +6,152 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@yield('title', 'Admin Panel') - {{ config('app.name', 'Laravel') }}</title>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-    <link rel="stylesheet" href="{{ asset('css/bootstrap.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/open-iconic-bootstrap.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
         :root {
+            --bs-primary: #c49b63;
+            --bs-primary-rgb: 196, 155, 99;
             --sidebar-bg: #212529;
-            /* Dark */
-            --sidebar-text: rgba(255, 255, 255, 0.7);
-            --sidebar-text-hover: #ffffff;
-            --sidebar-active-bg: #c49b63;
-            /* Warna aksen dari template */
-            --content-bg: #f8f9fa;
-            /* Light Gray */
-            --card-border: #dee2e6;
-            --card-bg: #ffffff;
+            --sidebar-width: 260px;
+            --bs-body-bg: #f4f7fc;
+            --bs-body-color: #5a5c69;
         }
 
         body {
             font-family: 'Poppins', sans-serif;
-            background-color: var(--content-bg);
+            background-color: var(--bs-body-bg);
+            color: var(--bs-body-color);
         }
 
+        /* DIPERBAIKI: Struktur layout utama */
         .admin-wrapper {
             display: flex;
-            min-height: 100vh;
+            width: 100%;
+            align-items: stretch;
         }
 
-        .main-content {
-            flex-grow: 1;
-            padding: 2rem;
+        #sidebar {
+            min-width: var(--sidebar-width);
+            max-width: var(--sidebar-width);
+            background: var(--sidebar-bg);
+            color: #fff;
+            transition: all 0.3s;
+        }
+
+        #sidebar.toggled {
+            margin-left: calc(-1 * var(--sidebar-width));
+        }
+
+        #content-wrapper {
+            width: 100%;
+            padding: 0;
+            transition: all 0.3s;
+        }
+
+        /* Styling Sidebar */
+        #sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 500;
+            padding: 0.8rem 1.5rem;
             display: flex;
-            flex-direction: column;
+            align-items: center;
         }
 
-        .content-header {
-            margin-bottom: 2rem;
+        #sidebar .nav-link .bi {
+            margin-right: 1rem;
+            font-size: 1.1rem;
+        }
+
+        #sidebar .nav-link:hover {
+            color: #fff;
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        #sidebar .nav-link.active {
+            color: #fff;
+            background-color: var(--bs-primary);
+        }
+
+        .sidebar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            padding: 1.75rem 1.5rem;
+            color: #fff;
+            text-align: center;
+        }
+
+        /* Styling Topbar & Konten */
+        .topbar {
+            height: 70px;
+            background-color: #fff;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+            padding: 0 2rem;
+        }
+
+        .container-fluid {
+            padding: 2rem;
         }
 
         .card {
-            border: 1px solid var(--card-border);
-            border-radius: 0.5rem;
-            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            border: none;
+            border-radius: 0.75rem;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+            margin-bottom: 1.5rem;
         }
 
         .card-header {
-            background-color: var(--card-bg);
-            border-bottom: 1px solid var(--card-border);
+            background-color: #fff;
+            border-bottom: 1px solid #e3e6f0;
+            padding: 1rem 1.5rem;
             font-weight: 600;
         }
 
-        .table {
-            margin-bottom: 0;
-        }
-
-        .table thead th {
-            border-bottom-width: 2px;
-            font-weight: 500;
-        }
-
         .btn-primary {
-            background-color: var(--sidebar-active-bg);
-            border-color: var(--sidebar-active-bg);
+            background-color: var(--bs-primary);
+            border-color: var(--bs-primary);
         }
 
         .btn-primary:hover {
-            background-color: #b38b52;
-            border-color: #b38b52;
-        }
-
-        .alert {
-            border-radius: 0.5rem;
+            opacity: 0.9;
         }
     </style>
+    @stack('styles')
 </head>
 
 <body>
     <div class="admin-wrapper">
-        @include('partials.sidebar')
-        <main class="main-content">
-            @include('partials.alerts')
-            @yield('content')
-        </main>
+        @include('partials.sidebar') <div id="content-wrapper" class="d-flex flex-column">
+            <main id="content">
+                <nav class="topbar d-flex justify-content-between align-items-center">
+                    <button id="sidebarToggle" class="btn text-secondary"><i class="bi bi-list fs-4"></i></button>
+                </nav>
+
+                <div class="container-fluid">
+                    @include('partials.alerts')
+                    @yield('content')
+                </div>
+            </main>
+        </div>
     </div>
 
-    <script src="{{ asset('js/jquery.min.js') }}"></script>
-    <script src="{{ asset('js/popper.min.js') }}"></script>
-    <script src="{{ asset('js/bootstrap.min.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        // Logika untuk toggle sidebar
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        if (sidebarToggle) {
+            sidebarToggle.addEventListener('click', event => {
+                event.preventDefault();
+                document.getElementById('sidebar').classList.toggle('toggled');
+            });
+        }
+    </script>
+    @stack('scripts')
 </body>
 
 </html>

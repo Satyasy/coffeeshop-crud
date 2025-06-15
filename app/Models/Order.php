@@ -13,6 +13,7 @@ class Order extends Model
         'user_id',
         'status',
         'total_price',
+        'price_at_order',
     ];
 
     /**
@@ -26,10 +27,10 @@ class Order extends Model
     /**
      * Relasi: Satu Order memiliki banyak OrderItem.
      */
-    public function items()
-    {
-        return $this->hasMany(OrderItem::class);
-    }
+    public function orderItems() // Nama method harus persis seperti ini
+{
+    return $this->hasMany(OrderItem::class, 'order_id', 'order_id');
+}
 
     /**
      * Relasi: Satu Order memiliki satu Payment.

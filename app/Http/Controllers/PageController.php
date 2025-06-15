@@ -3,116 +3,85 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Menu; // Import model Menu
+use App\Models\Review; // Import model Review
 
 class PageController extends Controller
 {
     /**
-     * Menampilkan halaman beranda.
-     *
-     * @return \Illuminate\View\View
+     * Menampilkan halaman utama (home/index) dengan data testimoni/review.
      */
-    public function home()
-    {
-        return view('pages.index');
-    }
+// di dalam PageController.php
+
+public function home()
+{
+    // Ambil 5 review terbaru untuk testimoni
+    $reviews = Review::with('user')
+                     ->where('is_anonymous', false)
+                     ->latest()
+                     ->take(5)
+                     ->get();
+
+    // Hapus pengambilan data $featuredMenus
+    // $featuredMenus = Menu::where('is_available', true)->latest()->take(4)->get();
+
+    // Kirim hanya data reviews ke view
+    return view('pages.index', compact('reviews'));
+}
 
     /**
-     * Menampilkan halaman About Us.
-     *
-     * @return \Illuminate\View\View
+     * Menampilkan halaman 'About'.
      */
     public function about()
     {
+        // Jika halaman 'about' juga butuh data review, tambahkan di sini.
+        // Jika tidak, biarkan kosong.
         return view('pages.about');
     }
 
     /**
-     * Menampilkan halaman Menu.
-     *
-     * @return \Illuminate\View\View
+     * Menampilkan halaman menu publik dengan data dari database.
      */
     public function menu()
-    {
-        return view('pages.menu');
-    }
+{
+    // Ambil semua menu yang tersedia dan kelompokkan berdasarkan kategori
+    $menus = Menu::where('is_available', true)
+                 ->latest()
+                 ->get()
+                 ->groupBy('category'); // Ini sudah benar
+
+    // Ambil semua kategori unik untuk membuat tombol/tab navigasi
+    $categories = Menu::where('is_available', true)
+                      ->distinct()
+                      ->pluck('category');
+
+    // Kirim kedua data ke view
+    return view('pages.menu', compact('menus', 'categories'));
+}
 
     /**
-     * Menampilkan halaman Services.
-     *
-     * @return \Illuminate\View\View
+     * Menampilkan halaman 'Services'.
      */
     public function services()
     {
+        // Dihapus dari routes/web.php untuk menghindari error,
+        // tapi jika ingin digunakan lagi, pastikan view-nya ada.
         return view('pages.services');
     }
 
     /**
-     * Menampilkan halaman Blog.
-     *
-     * @return \Illuminate\View\View
+     * Menampilkan halaman 'Blog'.
      */
     public function blog()
     {
         return view('pages.blog');
     }
-
+    
     /**
-     * Menampilkan halaman Contact.
-     *
-     * @return \Illuminate\View\View
+     * Menampilkan halaman 'Contact'.
      */
     public function contact()
     {
         return view('pages.contact');
-    }
-
-    /**
-     * Menampilkan halaman detail artikel blog.
-     *
-     * @return \Illuminate\View\View
-     */
-    public function blogSingle()
-    {
-        return view('pages.blog-single');
-    }
-
-    /**
-     * Menampilkan halaman keranjang belanja.
-     *
-     * @return \Illuminate\View\View
-     */
-    public function cart()
-    {
-        return view('pages.cart');
-    }
-
-    /**
-     * Menampilkan halaman checkout.
-     *
-     * @return \Illuminate\View\View
-     */
-    public function checkout()
-    {
-        return view('pages.checkout');
-    }
-
-    /**
-     * Menampilkan halaman toko/produk.
-     *
-     * @return \Illuminate\View\View
-     */
-    public function shop()
-    {
-        return view('pages.shop');
-    }
-
-    /**
-     * Menampilkan halaman detail produk tunggal.
-     *
-     * @return \Illuminate\View\View
-     */
-    public function productSingle()
-    {
-        return view('pages.product-single');
     }
 }

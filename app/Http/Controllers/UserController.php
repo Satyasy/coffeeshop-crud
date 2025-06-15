@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
-use Illuminate\Support\Facades\Auth; // <-- DIperbaiki: Tambahkan use statement untuk Auth
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
@@ -25,10 +25,13 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $validatedData = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email',
+            'name' => 'required|string|max:100',
+            'email' => 'required|string|email|max:100|unique:users,email',
             'password' => ['required', 'confirmed', Password::defaults()],
-            'role' => ['required', Rule::in(['user', 'admin'])],
+            'phone' => ['nullable', 'string', 'max:20'],
+            'address' => ['nullable', 'string'],
+            // DIPERBAIKI: Aturan validasi sekarang menggunakan peran yang baru
+            'role' => ['required', Rule::in(['customer', 'cashier', 'admin'])],
         ]);
 
         $validatedData['password'] = Hash::make($validatedData['password']);
@@ -51,10 +54,13 @@ class UserController extends Controller
     public function update(Request $request, User $user)
     {
         $validatedData = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
+            'name' => 'required|string|max:100',
+            'email' => ['required','string','email','max:100', Rule::unique('users')->ignore($user->id, 'user_id')], // Sesuaikan dengan primary key jika kustom
             'password' => ['nullable', 'confirmed', Password::defaults()],
-            'role' => ['required', Rule::in(['user', 'admin'])],
+            'phone' => ['nullable', 'string', 'max:20'],
+            'address' => ['nullable', 'string'],
+            // DIPERBAIKI: Aturan validasi sekarang menggunakan peran yang baru
+            'role' => ['required', Rule::in(['customer', 'cashier', 'admin'])],
         ]);
 
         if (!empty($validatedData['password'])) {
@@ -68,17 +74,11 @@ class UserController extends Controller
         return redirect()->route('admin.users.index')->with('success', 'User updated successfully.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(User $user)
     {
-        // --- BLOK KODE YANG DIPERBAIKI ---
-        // Menggunakan Auth::id() yang lebih eksplisit dan aman
-        if (Auth::id() == $user->id) {
+        if (Auth::id() == $user->getKey()) { // Menggunakan getKey() untuk kompatibilitas primary key kustom
             return back()->with('error', 'You cannot delete yourself.');
         }
-        // --- AKHIR BLOK KODE YANG DIPERBAIKI ---
 
         $user->delete();
         return redirect()->route('admin.users.index')->with('success', 'User deleted successfully.');

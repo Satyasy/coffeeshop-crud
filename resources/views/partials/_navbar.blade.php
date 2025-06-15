@@ -12,14 +12,24 @@
                         class="nav-link">Home</a></li>
                 <li class="nav-item {{ request()->routeIs('menu') ? 'active' : '' }}"><a href="{{ route('menu') }}"
                         class="nav-link">Menu</a></li>
-                <li class="nav-item {{ request()->routeIs('services') ? 'active' : '' }}"><a
-                        href="{{ route('services') }}" class="nav-link">Services</a></li>
-                <li class="nav-item {{ request()->routeIs('blog') ? 'active' : '' }}"><a href="{{ route('blog') }}"
-                        class="nav-link">Blog</a></li>
                 <li class="nav-item {{ request()->routeIs('about') ? 'active' : '' }}"><a href="{{ route('about') }}"
                         class="nav-link">About</a></li>
-                <li class="nav-item {{ request()->routeIs('contact') ? 'active' : '' }}"><a
-                        href="{{ route('contact') }}" class="nav-link">Contact</a></li>
+
+                {{-- ======================================================= --}}
+                {{-- === TAMBAHKAN BLOK INI UNTUK CART === --}}
+                {{-- ======================================================= --}}
+                @auth {{-- Hanya tampilkan jika user sudah login --}}
+                    <li class="nav-item cart {{ request()->routeIs('cart.*') ? 'active' : '' }}">
+                        <a href="{{ route('cart.index') }}" class="nav-link">
+                            <span class="icon icon-shopping_cart"></span>
+                            {{-- Tampilkan jumlah item jika ada --}}
+                            @if(CartHelper::itemCount() > 0)
+                                <span class="badge bg-primary rounded-circle" style="position: absolute; top: 10px; right: 0; font-size: 10px;">{{ CartHelper::itemCount() }}</span>
+                            @endif
+                        </a>
+                    </li>
+                @endauth
+                {{-- ======================================================= --}}
 
                 {{-- --- BLOK LOGIN & LOGOUT BARU --- --}}
                 @guest
@@ -54,10 +64,7 @@
                     </li>
                 @endauth
                 {{-- --- AKHIR BLOK LOGIN & LOGOUT --- --}}
-
-                {{-- Link keranjang belanja (cart) bisa dikembangkan nanti --}}
-                <li class="nav-item cart"><a href="#" class="nav-link"><span
-                            class="icon icon-shopping_cart"></span></a></li>
+            
             </ul>
         </div>
     </div>

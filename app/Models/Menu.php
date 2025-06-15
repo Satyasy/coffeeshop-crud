@@ -31,4 +31,9 @@ class Menu extends Model
     {
         return $this->hasMany(Review::class);
     }
+
+    public function getRouteKeyName()
+    {
+        return 'menu_id'; // Beritahu Laravel untuk menggunakan 'menu_id' untuk Route Model Binding
+    }
 }

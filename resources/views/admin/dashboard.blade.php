@@ -3,68 +3,60 @@
 @section('title', 'Dashboard')
 
 @section('content')
-    <div class="content-header">
-        <h1 class="h2 font-weight-bold">Dashboard</h1>
-        <p class="text-muted">Selamat datang kembali, {{ Auth::user()->name }}!</p>
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
+        <a href="#" class="btn btn-primary shadow-sm"><i class="bi bi-download me-2"></i>Generate Report</a>
     </div>
 
     <div class="row">
-        <div class="col-md-6 col-lg-3 mb-4">
-            <div class="stat-card h-100">
-                <div class="stat-card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="text-muted font-weight-normal mb-1">Total Pengguna Aktif</h6>
-                            <h3 class="font-weight-bold mb-0">{{ $totalUsers }}</h3>
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-start border-primary border-4 h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col me-2">
+                            <div class="text-xs fw-bold text-primary text-uppercase mb-1">Total Pengguna</div>
+                            <div class="h5 mb-0 fw-bold">{{ $totalUsers ?? 'N/A' }}</div>
                         </div>
-                        <div class="stat-card-icon icon-users">
-                            <span class="oi oi-people"></span>
-                        </div>
+                        <div class="col-auto"><i class="bi bi-people-fill fs-2 text-gray-300"></i></div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-6 col-lg-3 mb-4">
-            <div class="stat-card h-100">
-                <div class="stat-card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="text-muted font-weight-normal mb-1">Total Penjualan</h6>
-                            <h3 class="font-weight-bold mb-0">Rp {{ number_format($totalSales, 0, ',', '.') }}</h3>
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-start border-success border-4 h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col me-2">
+                            <div class="text-xs fw-bold text-success text-uppercase mb-1">Total Penjualan</div>
+                            <div class="h5 mb-0 fw-bold">Rp {{ number_format($totalSales ?? 0, 0, ',', '.') }}</div>
                         </div>
-                        <div class="stat-card-icon icon-sales">
-                            <span class="oi oi-dollar"></span>
-                        </div>
+                        <div class="col-auto"><i class="bi bi-cash-coin fs-2 text-gray-300"></i></div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-6 col-lg-3 mb-4">
-            <div class="stat-card h-100">
-                <div class="stat-card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="text-muted font-weight-normal mb-1">Sisa Stok Menu</h6>
-                            <h3 class="font-weight-bold mb-0">{{ $totalStock }} Pcs</h3>
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-start border-info border-4 h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col me-2">
+                            <div class="text-xs fw-bold text-info text-uppercase mb-1">Sisa Stok</div>
+                            <div class="h5 mb-0 fw-bold">{{ $totalStock ?? 'N/A' }} Pcs</div>
                         </div>
-                        <div class="stat-card-icon icon-stock">
-                            <span class="oi oi-inbox"></span>
-                        </div>
+                        <div class="col-auto"><i class="bi bi-box-seam-fill fs-2 text-gray-300"></i></div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-6 col-lg-3 mb-4">
-            <div class="stat-card h-100">
-                <div class="stat-card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="text-muted font-weight-normal mb-1">Pembayaran Sukses</h6>
-                            <h3 class="font-weight-bold mb-0">{{ $totalPayments }}</h3>
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-start border-warning border-4 h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col me-2">
+                            <div class="text-xs fw-bold text-warning text-uppercase mb-1">Pembayaran Sukses</div>
+                            <div class="h5 mb-0 fw-bold">{{ $totalPayments ?? 'N/A' }}</div>
                         </div>
-                        <div class="stat-card-icon icon-payments">
-                            <span class="oi oi-task"></span>
-                        </div>
+                        <div class="col-auto"><i class="bi bi-check2-circle fs-2 text-gray-300"></i></div>
                     </div>
                 </div>
             </div>
@@ -72,74 +64,140 @@
     </div>
 
     <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    Aktivitas Terbaru
+        <div class="col-lg-7 mb-4">
+            <div class="card shadow h-100">
+                <div class="card-header py-3">
+                    <h6 class="m-0 fw-bold text-primary">Grafik Pendapatan (7 Hari Terakhir)</h6>
                 </div>
                 <div class="card-body">
-                    <p class="text-center text-muted">Grafik penjualan atau daftar pesanan terbaru akan muncul di sini.</p>
+                    <div style="position: relative; height:320px; width:100%">
+                        <canvas id="revenueChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5 mb-4">
+            <div class="card shadow h-100">
+                <div class="card-header py-3">
+                    <h6 class="m-0 fw-bold text-primary">Komposisi Peran Pengguna</h6>
+                </div>
+                <div class="card-body">
+                    <div style="position: relative; height:320px; width:100%">
+                        <canvas id="rolesChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12 mb-4">
+            <div class="card shadow h-100">
+                <div class="card-header py-3">
+                    <h6 class="m-0 fw-bold text-primary">Menu Paling Laris (Contoh)</h6>
+                </div>
+                <div class="card-body">
+                    <div style="position: relative; height:320px; width:100%">
+                        <canvas id="topMenusChart"></canvas>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 @endsection
 
+@push('scripts')
+    <script>
+        // Data Global untuk Grafik (Anda bisa ganti dengan data dari controller)
+        const brandColor = '#c49b63';
+        const brandColorRGB = '196, 155, 99';
 
-{{-- Tambahkan CSS ini ke layout admin Anda atau di sini --}}
-@push('styles')
-    <style>
-        .stat-card {
-            background-color: #fff;
-            border: 1px solid var(--card-border);
-            border-radius: 0.75rem;
-            box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.05);
-            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-        }
+        // ===================================
+        // ### CHART 1: GRAFIK PENDAPATAN ###
+        // ===================================
+        new Chart(document.getElementById('revenueChart'), {
+            type: 'line',
+            data: {
+                labels: ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'],
+                datasets: [{
+                    label: "Pendapatan",
+                    lineTension: 0.3,
+                    backgroundColor: `rgba(${brandColorRGB}, 0.1)`,
+                    borderColor: brandColor,
+                    pointBackgroundColor: brandColor,
+                    data: [120000, 190000, 150000, 250000, 220000, 300000, 280000],
+                }]
+            },
+            options: {
+                maintainAspectRatio: false, // Penting! Agar grafik mengisi wadah div
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        ticks: {
+                            callback: value => 'Rp ' + new Intl.NumberFormat('id-ID').format(value)
+                        }
+                    }
+                }
+            }
+        });
 
-        .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
-        }
+        // ========================================
+        // ### CHART 2: GRAFIK PERAN PENGGUNA ###
+        // ========================================
+        new Chart(document.getElementById('rolesChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Customer', 'Admin', 'Cashier'],
+                datasets: [{
+                    data: [50, 5, 10],
+                    backgroundColor: [brandColor, '#36a2eb', '#ff6384'],
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                maintainAspectRatio: false, // Penting!
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
 
-        .stat-card-body {
-            padding: 1.5rem;
-        }
-
-        .stat-card-icon {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            font-size: 1.5rem;
-            color: #fff;
-        }
-
-        .icon-users {
-            background-color: #17a2b8;
-        }
-
-        /* Info */
-        .icon-sales {
-            background-color: #28a745;
-        }
-
-        /* Success */
-        .icon-stock {
-            background-color: #ffc107;
-        }
-
-        /* Warning */
-        .icon-payments {
-            background-color: #007bff;
-        }
-
-        /* Primary */
-    </style>
+        // =====================================
+        // ### CHART 3: GRAFIK MENU TERLARIS ###
+        // =====================================
+        new Chart(document.getElementById('topMenusChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Americano', 'Latte', 'Cappuccino', 'Red Velvet', 'Matcha'],
+                datasets: [{
+                    label: 'Jumlah Terjual',
+                    data: [65, 59, 80, 81, 56],
+                    backgroundColor: `rgba(${brandColorRGB}, 0.8)`,
+                    borderColor: `rgba(${brandColorRGB}, 1)`,
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                maintainAspectRatio: false, // Penting!
+                indexAxis: 'y',
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    x: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
 @endpush
-
-{{-- Jika layout Anda belum punya @stack('styles'), tambahkan ini di <head> layout admin: --}}
-{{-- @stack('styles') --}}
-jdo
