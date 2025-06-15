@@ -53,8 +53,8 @@ class ReviewController extends Controller
     public function update(Request $request, Review $review)
     {
         $validatedData = $request->validate([
-            'user_id' => 'required|exists:users,id',
-            'menu_id' => 'required|exists:menus,id',
+            'user_id' => 'required|exists:users,user_id', // Corrected: users table uses user_id
+            'menu_id' => 'required|exists:menus,menu_id', // Corrected: menus table uses menu_id
             'rating' => 'required|integer|min:1|max:5',
             'comment' => 'required|string',
         ]);

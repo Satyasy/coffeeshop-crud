@@ -12,15 +12,18 @@ return new class extends Migration {
             $table->string('name', 100);
             $table->string('email', 100)->unique();
             $table->string('phone', 20)->nullable();
-            $table->string('password'); // Laravel akan mengatur panjang default (255)
+            $table->string('password');
             $table->text('address')->nullable();
-            $table->enum('role', ['customer', 'cashier', 'admin']);
-            $table->timestamps(); // created_at dan updated_at
+            $table->enum('role', ['customer', 'cashier', 'admin'])->default('customer');
+            $table->timestamps();
         });
+
+        // Tidak perlu Schema::table terpisah untuk remember_token
     }
 
     public function down(): void
     {
         Schema::dropIfExists('users');
+        // Tidak perlu dropColumn terpisah karena tabel sudah di-drop
     }
 };

@@ -9,18 +9,25 @@ class Payment extends Model
 {
     use HasFactory;
 
+    protected $primaryKey = 'payment_id';
+    public $incrementing = true;
+
     protected $fillable = [
         'order_id',
+        'user_id',
         'amount',
-        'status',
         'payment_method',
+        'status',
+        'payment_gateway_reference'
     ];
 
-    /**
-     * Relasi: Satu Payment dimiliki oleh satu Order.
-     */
     public function order()
     {
-        return $this->belongsTo(Order::class);
+        return $this->belongsTo(Order::class, 'order_id', 'order_id');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'user_id');
     }
 }

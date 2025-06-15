@@ -49,7 +49,7 @@ class OrderController extends Controller
     public function update(Request $request, Order $order)
     {
         $validatedData = $request->validate([
-            'user_id' => 'required|exists:users,id',
+            'user_id' => 'required|exists:users,user_id', // Corrected: users table uses user_id
             'status' => ['required', 'string', Rule::in(['pending', 'processing', 'completed', 'cancelled'])],
             'total_price' => 'required|numeric|min:0',
         ]);

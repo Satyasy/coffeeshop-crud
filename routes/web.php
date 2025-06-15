@@ -121,6 +121,7 @@ Route::middleware('auth')->group(function () {
             Route::resource('orders', OrderController::class);
             Route::resource('order-items', OrderItemController::class);
             Route::resource('payments', PaymentController::class);
+
             Route::resource('reviews', ReviewController::class);
         });
 

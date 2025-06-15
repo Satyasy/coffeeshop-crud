@@ -17,14 +17,16 @@ class PaymentController extends Controller
 
     public function create()
     {
-        $orders = Order::whereDoesntHave('payment')->orderBy('id', 'desc')->get();
+        $orders = Order::whereDoesntHave('payment')
+            ->orderBy('order_id', 'desc')
+            ->get();
+
         return view('payments.create', compact('orders'));
     }
-
     public function store(Request $request)
     {
         $validatedData = $request->validate([
-            'order_id' => 'required|exists:orders,id|unique:payments,order_id',
+            'order_id' => 'required|exists:orders,order_id|unique:payments,order_id', // Corrected: orders table uses order_id
             'amount' => 'required|numeric|min:0',
             'payment_method' => 'required|string|max:255',
             'status' => ['required', Rule::in(['pending', 'completed', 'failed'])],
@@ -50,7 +52,7 @@ class PaymentController extends Controller
     public function update(Request $request, Payment $payment)
     {
         $validatedData = $request->validate([
-            'order_id' => ['required', 'exists:orders,id', Rule::unique('payments')->ignore($payment->id)],
+            'order_id' => ['required', 'exists:orders,order_id', Rule::unique('payments', 'order_id')->ignore($payment->payment_id, 'payment_id')], // Corrected for order_id in orders and payment_id in payments
             'amount' => 'required|numeric|min:0',
             'payment_method' => 'required|string|max:255',
             'status' => ['required', Rule::in(['pending', 'completed', 'failed'])],
