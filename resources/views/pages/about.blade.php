@@ -30,87 +30,64 @@
         </div>
     </section>
 
-    <section class="ftco-section img" id="ftco-testimony" style="background-image: url({{ asset('images/bg_1.jpg') }});"  data-stellar-background-ratio="0.5">
-        <div class="overlay"></div>
-        <div class="container">
-            <div class="row justify-content-center mb-5">
-                <div class="col-md-7 heading-section text-center ftco-animate">
-                    <span class="subheading">Testimony</span>
-                    <h2 class="mb-4">Customers Says</h2>
-                    <p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.</p>
-                </div>
+    <section class="ftco-section img" id="ftco-testimony" style="background-image: url({{ asset('images/bg_1.jpg') }});" data-stellar-background-ratio="0.5">
+    <div class="overlay"></div>
+    <div class="container">
+        <div class="row justify-content-center mb-5">
+            <div class="col-md-7 heading-section text-center ftco-animate">
+                <span class="subheading">Testimony</span>
+                <h2 class="mb-4">Customers Says</h2>
+                <p>Apa kata pelanggan kami tentang kopi dan layanan yang kami berikan.</p>
             </div>
         </div>
-        <div class="container-wrap">
+    </div>
+    <div class="container-wrap">
+        {{-- Cek apakah ada data review --}}
+        @if($reviews->isNotEmpty())
             <div class="row d-flex no-gutters">
-                <div class="col-lg align-self-sm-end">
-                    <div class="testimony">
-                        <blockquote>
-                            <p>&ldquo;Even the all-powerful Pointing has no control about the blind texts it is an almost unorthographic life One day however a small.&rdquo;</p>
-                        </blockquote>
-                        <div class="author d-flex mt-4">
-                            <div class="image mr-3 align-self-center">
-                                <img src="{{ asset('images/person_1.jpg') }}" alt="">
+                {{-- Loop untuk setiap review dari database --}}
+                @foreach($reviews as $key => $review)
+                    {{-- Memberi class 'overlay' pada testimoni yang genap untuk efek visual --}}
+                    <div class="col-lg align-self-sm-end">
+                        <div class="testimony {{ $key % 2 != 0 ? 'overlay' : '' }}">
+                            <blockquote>
+                                {{-- Tampilkan komentar dari database --}}
+                                <p>“{{ $review->comment }}”</p>
+                            </blockquote>
+                            <div class="author d-flex mt-4">
+                                <div class="image mr-3 align-self-center">
+                                    {{-- Tampilkan gambar profil default atau dari user jika ada --}}
+                                    <img src="{{ asset('images/person_'.($key % 3 + 1).'.jpg') }}" alt="Customer photo">
+                                </div>
+                                <div class="name align-self-center">
+                                    {{-- Tampilkan nama user dari database --}}
+                                    {{ $review->user->name ?? 'Anonymous' }}
+                                    {{-- Menampilkan rating dalam bentuk bintang --}}
+                                    <span class="position d-block">
+                                        @for ($i = 0; $i < 5; $i++)
+                                            @if ($i < $review->rating)
+                                                <span class="icon-star"></span>
+                                            @else
+                                                <span class="icon-star-o"></span>
+                                            @endif
+                                        @endfor
+                                    </span>
+                                </div>
                             </div>
-                            <div class="name align-self-center">Louise Kelly <span class="position">Illustrator Designer</span></div>
                         </div>
                     </div>
-                </div>
-                <div class="col-lg align-self-sm-end">
-                    <div class="testimony overlay">
-                        <blockquote>
-                            <p>&ldquo;Even the all-powerful Pointing has no control about the blind texts it is an almost unorthographic life One day however a small line of blind text by the name of Lorem Ipsum decided to leave for the far World of Grammar.&rdquo;</p>
-                        </blockquote>
-                        <div class="author d-flex mt-4">
-                            <div class="image mr-3 align-self-center">
-                                <img src="{{ asset('images/person_2.jpg') }}" alt="">
-                            </div>
-                            <div class="name align-self-center">Louise Kelly <span class="position">Illustrator Designer</span></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg align-self-sm-end">
-                    <div class="testimony">
-                        <blockquote>
-                            <p>&ldquo;Even the all-powerful Pointing has no control about the blind texts it is an almost unorthographic life One day however a small line of blind text by the name. &rdquo;</p>
-                        </blockquote>
-                        <div class="author d-flex mt-4">
-                            <div class="image mr-3 align-self-center">
-                                <img src="{{ asset('images/person_3.jpg') }}" alt="">
-                            </div>
-                            <div class="name align-self-center">Louise Kelly <span class="position">Illustrator Designer</span></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg align-self-sm-end">
-                    <div class="testimony overlay">
-                        <blockquote>
-                            <p>&ldquo;Even the all-powerful Pointing has no control about the blind texts it is an almost unorthographic life One day however.&rdquo;</p>
-                        </blockquote>
-                        <div class="author d-flex mt-4">
-                            <div class="image mr-3 align-self-center">
-                                <img src="{{ asset('images/person_2.jpg') }}" alt="">
-                            </div>
-                            <div class="name align-self-center">Louise Kelly <span class="position">Illustrator Designer</span></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg align-self-sm-end">
-                    <div class="testimony">
-                        <blockquote>
-                            <p>&ldquo;Even the all-powerful Pointing has no control about the blind texts it is an almost unorthographic life One day however a small line of blind text by the name. &rdquo;</p>
-                        </blockquote>
-                        <div class="author d-flex mt-4">
-                            <div class="image mr-3 align-self-center">
-                                <img src="{{ asset('images/person_3.jpg') }}" alt="">
-                            </div>
-                            <div class="name align-self-center">Louise Kelly <span class="position">Illustrator Designer</span></div>
-                        </div>
-                    </div>
+                @endforeach
+            </div>
+        @else
+            {{-- Tampilkan pesan ini jika tidak ada review sama sekali --}}
+            <div class="row justify-content-center">
+                <div class="col-md-7 text-center text-white">
+                    <p>Belum ada testimoni yang bisa ditampilkan.</p>
                 </div>
             </div>
-        </div>
-    </section>
+        @endif
+    </div>
+</section>
 
     <section class="ftco-section">
         <div class="container">

@@ -3,15 +3,18 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
+
+// Import semua controller yang akan digunakan
 use App\Http\Controllers\PageController;
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\OrderItemController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ReviewController;
-use App\Models\User;
-use Illuminate\Support\Facades\Hash;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,15 +22,18 @@ use Illuminate\Support\Facades\Hash;
 |--------------------------------------------------------------------------
 */
 
-// --- Rute Halaman Publik ---
+// --- Rute Halaman Publik (Bisa diakses siapa saja) ---
 Route::get('/', [PageController::class, 'home'])->name('home');
 Route::get('/about', [PageController::class, 'about'])->name('about');
 Route::get('/menu', [PageController::class, 'menu'])->name('menu');
-// ... tambahkan rute publik lain jika perlu
 
-// --- Rute Autentikasi ---
+
+// --- Rute Autentikasi untuk Pengunjung (Guest) ---
 Route::middleware('guest')->group(function () {
+    // Form Login
     Route::get('/login', fn() => view('auth.login'))->name('login');
+
+    // Proses Login
     Route::post('/login', function (Request $request) {
         $credentials = $request->validate(['email' => 'required|email', 'password' => 'required']);
         if (Auth::attempt($credentials, $request->filled('remember'))) {
@@ -41,7 +47,10 @@ Route::middleware('guest')->group(function () {
         return back()->withErrors(['email' => 'The provided credentials do not match our records.'])->onlyInput('email');
     });
 
+    // Form Registrasi
     Route::get('/register', fn() => view('auth.register'))->name('register');
+
+    // Proses Registrasi
     Route::post('/register', function (Request $request) {
         $request->validate(['name' => 'required|string', 'email' => 'required|email|unique:users,email', 'password' => 'required|string|min:8|confirmed']);
         $user = User::create(['name' => $request->name, 'email' => $request->email, 'password' => Hash::make($request->password), 'role' => 'customer']);
@@ -52,6 +61,7 @@ Route::middleware('guest')->group(function () {
 
 // --- Rute yang Memerlukan Login ---
 Route::middleware('auth')->group(function () {
+    // Proses Logout
     Route::post('/logout', function (Request $request) {
         Auth::logout();
         $request->session()->invalidate();
@@ -59,11 +69,31 @@ Route::middleware('auth')->group(function () {
         return redirect('/login');
     })->name('logout');
 
-    // --- GRUP ADMIN ---
+
+    // --- Rute untuk Pengguna Biasa (Customer) ---
+
+    // Grup Route untuk Keranjang Belanja (Cart)
+    Route::prefix('cart')->name('cart.')->group(function () {
+        Route::get('/', [CartController::class, 'index'])->name('index');
+        Route::post('/add/{menu:menu_id}', [CartController::class, 'add'])->name('add');
+        Route::patch('/update/{menu}', [CartController::class, 'update'])->name('update');
+        Route::delete('/remove/{menu}', [CartController::class, 'remove'])->name('remove');
+        Route::delete('/clear', [CartController::class, 'clear'])->name('clear');
+    });
+
+    // Route untuk Checkout
+    Route::get('/checkout', [OrderController::class, 'checkout'])->name('checkout');
+    Route::post('/checkout', [OrderController::class, 'placeOrder'])->name('checkout.place');
+    Route::get('/payment/order/{order}', [PaymentController::class, 'showPaymentPage'])->name('payment.show');
+
+
+    // --- GRUP ADMIN (Hanya bisa diakses oleh role 'admin' atau 'cashier') ---
     Route::prefix('admin')->middleware('role:admin,cashier')->name('admin.')->group(function () {
-        Route::get('/dashboard', fn() => view('admin.dashboard'))->name('dashboard');
+        
+        Route::get('/dashboard', fn() => redirect()->route('admin.menus.index'))->name('dashboard');
         Route::get('/', fn() => redirect()->route('admin.dashboard'));
         
+        // Semua route resource CRUD untuk admin
         Route::resource('users', UserController::class);
         Route::resource('menus', MenuController::class);
         Route::resource('orders', OrderController::class);

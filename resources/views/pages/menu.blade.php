@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Our Menu') {{-- Opsional: Menambahkan judul halaman --}}
+@section('title', 'Our Menu')
 
 @section('content')
 
@@ -18,58 +18,68 @@
         </div>
     </section>
 
-    {{-- Anda bisa menghapus section ftco-intro jika tidak relevan dengan halaman menu --}}
-    <section class="ftco-intro">
-        {{-- ... (Konten intro statis Anda) ... --}}
-    </section>
-
     <section class="ftco-section">
         <div class="container">
-            <div class="row">
+            <div class="row justify-content-center mb-5 pb-3">
+                <div class="col-md-7 heading-section ftco-animate text-center">
+                    <h2 class="mb-4">Pilih Menu Favoritmu</h2>
+                    <p>Temukan beragam pilihan kopi, minuman non-kopi, dan makanan ringan yang kami siapkan khusus untuk Anda.</p>
+                </div>
+            </div>
 
-                {{-- Memulai Loop Dinamis --}}
-                @if($menus->isNotEmpty())
-                    {{-- Loop untuk setiap KATEGORI (Main Dish, Drinks, dll.) --}}
-                    @foreach($menus as $category => $items)
-                        <div class="col-md-6 mb-5 pb-3">
-                            <h3 class="mb-5 heading-pricing ftco-animate">{{ $category ?: 'Lainnya' }}</h3>
-                            
-                            {{-- Loop untuk setiap ITEM MENU di dalam kategori tersebut --}}
-                            @foreach($items as $menu)
-                                <div class="pricing-entry d-flex ftco-animate">
-                                    {{-- Gunakan gambar dari database --}}
-                                    <div class="img" style="background-image: url({{ $menu->image_url ? asset('storage/' . $menu->image_url) : asset('images/default-dish.jpg') }});"></div>
-                                    <div class="desc pl-3">
-                                        <div class="d-flex text align-items-center">
-                                            {{-- Tampilkan nama dan harga dari database --}}
-                                            <h3><span>{{ $menu->name }}</span></h3>
-                                            <span class="price">Rp{{ number_format($menu->price, 0, ',', '.') }}</span>
-                                        </div>
-                                        <div class="d-block">
-                                            {{-- Tampilkan deskripsi dari database --}}
-                                            <p>{{ $menu->description }}</p>
-                                        </div>
-                                    </div>
-                                </div>
+            {{-- Navigasi Tab untuk Kategori --}}
+            @if($categories->isNotEmpty())
+                <div class="row">
+                    <div class="col-md-12 text-center">
+                        <ul class="nav nav-pills mb-5 ftco-animate" id="pills-tab" role="tablist">
+                            {{-- Tombol untuk Semua Menu --}}
+                            <li class="nav-item">
+                                <a class="nav-link active" id="pills-all-tab" data-bs-toggle="pill" href="#pills-all" role="tab" aria-controls="pills-all" aria-selected="true">Semua Menu</a>
+                            </li>
+                            {{-- Tombol untuk setiap kategori dari database --}}
+                            @foreach($categories as $category)
+                                @if($category)
+                                    <li class="nav-item">
+                                        <a class="nav-link" id="pills-{{ Str::slug($category) }}-tab" data-bs-toggle="pill" href="#pills-{{ Str::slug($category) }}" role="tab" aria-controls="pills-{{ Str::slug($category) }}" aria-selected="false">{{ $category }}</a>
+                                    </li>
+                                @endif
                             @endforeach
-                            
-                        </div>
-                    @endforeach
-                @else
-                    <div class="col-12 text-center">
-                        <p>Saat ini belum ada menu yang tersedia. Silakan kembali lagi nanti.</p>
+                        </ul>
                     </div>
-                @endif
-                {{-- Akhir Loop Dinamis --}}
+                </div>
+            @endif
+
+            {{-- Konten Tab --}}
+            <div class="tab-content" id="pills-tabContent">
+                
+                {{-- Tab untuk "Semua Menu" --}}
+                <div class="tab-pane fade show active" id="pills-all" role="tabpanel" aria-labelledby="pills-all-tab">
+                    <div class="row">
+                        {{-- Loop semua item dari semua kategori --}}
+                        @forelse($menus->flatten() as $menu)
+                            @include('partials.menu_card', ['menu' => $menu])
+                        @empty
+                            <div class="col-12 text-center">
+                                <p>Saat ini belum ada menu yang tersedia.</p>
+                            </div>
+                        @endforelse
+                    </div>
+                </div>
+
+                {{-- Tab untuk setiap kategori --}}
+                @foreach($categories as $category)
+                    @if($category)
+                        <div class="tab-pane fade" id="pills-{{ Str::slug($category) }}" role="tabpanel" aria-labelledby="pills-{{ Str::slug($category) }}-tab">
+                            <div class="row">
+                                @foreach($menus[$category] as $menu)
+                                    @include('partials.menu_card', ['menu' => $menu])
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
+                @endforeach
 
             </div>
         </div>
     </section>
-
-    {{-- Anda bisa menghapus section ftco-menu jika bagian atas sudah cukup --}}
-    {{-- Atau Anda bisa mengisinya juga dengan loop yang sama --}}
-    <section class="ftco-menu mb-5 pb-5">
-       {{-- ... (Konten statis ftco-menu Anda) ... --}}
-    </section>
-
 @endsection
