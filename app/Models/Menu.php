@@ -9,6 +9,9 @@ class Menu extends Model
 {
     use HasFactory;
 
+    protected $primaryKey = 'menu_id'; // <-- TAMBAHKAN BARIS INI
+
+
     protected $fillable = [
         'name',
         'description',

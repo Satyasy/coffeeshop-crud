@@ -3,6 +3,10 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
+
+// Import semua controller yang dibutuhkan
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\MenuController;
@@ -10,13 +14,17 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\OrderItemController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ReviewController;
-use App\Models\User;
-use Illuminate\Support\Facades\Hash;
+use App\Http\Controllers\Admin\DashboardController;
 
 /*
 |--------------------------------------------------------------------------
 | Web Routes
 |--------------------------------------------------------------------------
+|
+| Di sini Anda bisa mendaftarkan route web untuk aplikasi Anda. Route ini
+| dimuat oleh RouteServiceProvider dan semuanya akan
+| ditugaskan ke grup middleware "web".
+|
 */
 
 // --- Rute Halaman Publik (Bisa diakses siapa saja) ---
@@ -26,8 +34,6 @@ Route::get('/menu', [PageController::class, 'menu'])->name('menu');
 Route::get('/services', [PageController::class, 'services'])->name('services');
 Route::get('/blog', [PageController::class, 'blog'])->name('blog');
 Route::get('/contact', [PageController::class, 'contact'])->name('contact');
-// Tambahkan rute publik lain jika ada, misal:
-// Route::get('/blog-single', [PageController::class, 'blogSingle'])->name('blog-single');
 
 // --- Rute Autentikasi untuk Pengunjung (Guest) ---
 Route::middleware('guest')->group(function () {
@@ -47,7 +53,7 @@ Route::middleware('guest')->group(function () {
             $request->session()->regenerate();
             $user = Auth::user();
 
-            if ($user->role === 'admin' || $user->role === 'cashier') {
+            if ($user->hasRole('admin') || $user->hasRole('cashier')) {
                 return redirect()->intended(route('admin.dashboard'));
             }
             return redirect()->intended(route('home'));
@@ -95,39 +101,32 @@ Route::middleware('auth')->group(function () {
         return redirect('/login');
     })->name('logout');
 
-    // --- GRUP ADMIN (Admin & Kasir) ---
-    Route::middleware('role:admin,cashier')->prefix('admin')->name('admin.')->group(function () {
+    // --- GRUP ADMIN (Admin & Kasir) - SUDAH DIRAPIKAN ---
+    Route::middleware('role:admin,cashier')
+        ->prefix('admin')
+        ->name('admin.')
+        ->group(function () {
 
-        // DIPERBARUI: Tambahkan route ini untuk redirect /admin ke dashboard
-        Route::get('/', function () {
-            return redirect()->route('admin.dashboard');
+            // Redirect dari /admin ke /admin/dashboard
+            Route::get('/', function () {
+                return redirect()->route('admin.dashboard');
+            });
+
+            // Route untuk Dashboard
+            Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+            // Route untuk semua resource CRUD
+            Route::resource('users', UserController::class);
+            Route::resource('menus', MenuController::class);
+            Route::resource('orders', OrderController::class);
+            Route::resource('order-items', OrderItemController::class);
+            Route::resource('payments', PaymentController::class);
+            Route::resource('reviews', ReviewController::class);
         });
 
-        Route::get('/dashboard', function () {
-            // Logika untuk dashboard Anda
-            return view('admin.dashboard'); // Pastikan Anda punya view ini
-        })->name('dashboard');
-
-        // ... sisa resource route Anda ...
-        Route::resource('users', UserController::class);
-        Route::resource('menus', MenuController::class);
-        Route::resource('orders', OrderController::class);
-        Route::resource('order-items', OrderItemController::class);
-        Route::resource('payments', PaymentController::class);
-        Route::resource('reviews', ReviewController::class);
-    });
-
-    // --- GRUP ADMIN (Admin & Kasir) ---
-    Route::middleware('role:admin,cashier')->prefix('admin')->name('admin.')->group(function () {
-
-        // Redirect '/admin' ke dashboard admin
-        Route::get('/', function () {
-            return redirect()->route('admin.dashboard');
-        });
-
-        // DIPERBARUI: Menggunakan DashboardController
-        Route::get('/dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
-
-        // ... sisa resource route Anda ...
-    });
+    // Anda bisa menambahkan route untuk role 'customer' di sini jika perlu
+    // Contoh:
+    // Route::middleware('role:customer')->prefix('profile')->name('profile.')->group(function() {
+    //     // Route untuk halaman profil customer
+    // });
 });
