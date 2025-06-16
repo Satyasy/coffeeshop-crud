@@ -28,7 +28,7 @@
                             <tbody>
                                 @foreach($cartItems as $id => $details)
                                     <tr class="text-center">
-                                        <td class="image-prod"><div class="img" style="background-image:url({{ $details['image_url'] ? asset('storage/' . $details['image_url']) : asset('images/default-dish.jpg') }});"></div></td>
+                                        <td class="image-prod"><div class="img" style="background-image:url({{ $details['image_url'] ? $details['image_url'] : asset('images/default-dish.jpg') }});"></div></td>
                                         <td class="product-name">
                                             <h3>{{ $details['name'] }}</h3>
                                         </td>

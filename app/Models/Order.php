@@ -13,8 +13,21 @@ class Order extends Model
         'user_id',
         'status',
         'total_price',
-        'price_at_order',
+        'order_type',
+        'delivery_address',
+        'notes_for_restaurant'
     ];
+    
+    // Konstanta untuk status order
+    const STATUS_PENDING = 'pending';
+    const STATUS_PROCESSING = 'processing';
+    const STATUS_COMPLETED = 'completed';
+    const STATUS_CANCELLED = 'cancelled';
+    
+    // Konstanta untuk tipe order
+    const TYPE_DINE_IN = 'dine_in';
+    const TYPE_TAKEAWAY = 'takeaway';
+    const TYPE_DELIVERY = 'delivery';
 
     /**
      * Relasi: Satu Order dimiliki oleh satu User.
@@ -37,6 +50,6 @@ class Order extends Model
      */
     public function payment()
     {
-        return $this->hasOne(Payment::class);
+        return $this->hasOne(Payment::class, 'order_id', 'order_id');
     }
 }
