@@ -257,6 +257,29 @@ fieldset {
   margin: 0;
   border: 0; }
 
+/* Styling untuk container gambar pada kartu menu */
+.menu-entry .img-container {
+    display: block;
+    width: 100%;
+    height: 250px; /* Atur tinggi yang sama untuk semua gambar */
+    overflow: hidden; /* Sembunyikan bagian gambar yang melebihi container */
+    margin-bottom: 20px; /* Jarak antara gambar dan teks, sama seperti .menu-img .img */
+}
+
+/* Styling untuk gambar di dalam container */
+.menu-entry .img-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Ini adalah kuncinya: membuat gambar memenuhi container tanpa merusak rasio aspek */
+    object-position: center; /* Pusatkan gambar di dalam container */
+    transition: transform 0.3s ease; /* Efek zoom halus saat hover */
+}
+
+/* Efek hover untuk zoom gambar */
+.menu-entry .img-container:hover img {
+    transform: scale(1.1);
+}
+
 legend {
   display: block;
   width: 100%;

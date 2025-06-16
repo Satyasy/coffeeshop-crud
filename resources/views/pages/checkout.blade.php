@@ -3,9 +3,6 @@
 @section('title', 'Checkout')
 
 @section('content')
-    <section class="home-slider owl-carousel">
-        {{-- ... (Bagian slider sama seperti sebelumnya) ... --}}
-    </section>
 
     <section class="ftco-section">
       <div class="container">
