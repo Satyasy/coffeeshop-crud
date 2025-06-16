@@ -38,8 +38,8 @@ class MenuController extends Controller
         if ($validator->fails()) {
             // PERBAIKAN: Redirect ke 'menus.create' (tanpa admin)
             return redirect()->route('admin.menus.create')
-                        ->withErrors($validator)
-                        ->withInput();
+                ->withErrors($validator)
+                ->withInput();
         }
 
         $data = $validator->validated();
@@ -85,8 +85,8 @@ class MenuController extends Controller
         if ($validator->fails()) {
             // PERBAIKAN: Redirect ke 'menus.edit' (tanpa admin)
             return redirect()->route('menus.edit', $menu->menu_id)
-                        ->withErrors($validator)
-                        ->withInput();
+                ->withErrors($validator)
+                ->withInput();
         }
 
         $data = $validator->validated();
