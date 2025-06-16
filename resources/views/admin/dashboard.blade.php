@@ -15,7 +15,7 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col me-2">
                             <div class="text-xs fw-bold text-primary text-uppercase mb-1">Total Pengguna</div>
-                            <div class="h5 mb-0 fw-bold">{{ $totalUsers ?? 'N/A' }}</div>
+                            <div class="h5 mb-0 fw-bold">{{ $totalUsers ?? 0 }}</div>
                         </div>
                         <div class="col-auto"><i class="bi bi-people-fill fs-2 text-gray-300"></i></div>
                     </div>
@@ -41,7 +41,7 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col me-2">
                             <div class="text-xs fw-bold text-info text-uppercase mb-1">Sisa Stok</div>
-                            <div class="h5 mb-0 fw-bold">{{ $totalStock ?? 'N/A' }} Pcs</div>
+                            <div class="h5 mb-0 fw-bold">{{ $totalStock ?? 0 }} Pcs</div>
                         </div>
                         <div class="col-auto"><i class="bi bi-box-seam-fill fs-2 text-gray-300"></i></div>
                     </div>
@@ -54,7 +54,7 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col me-2">
                             <div class="text-xs fw-bold text-warning text-uppercase mb-1">Pembayaran Sukses</div>
-                            <div class="h5 mb-0 fw-bold">{{ $totalPayments ?? 'N/A' }}</div>
+                            <div class="h5 mb-0 fw-bold">{{ $totalPayments ?? 0 }}</div>
                         </div>
                         <div class="col-auto"><i class="bi bi-check2-circle fs-2 text-gray-300"></i></div>
                     </div>
@@ -119,14 +119,14 @@
         new Chart(document.getElementById('revenueChart'), {
             type: 'line',
             data: {
-                labels: ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'],
+                labels: {!! json_encode($dates ?? ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min']) !!},
                 datasets: [{
                     label: "Pendapatan",
                     lineTension: 0.3,
                     backgroundColor: `rgba(${brandColorRGB}, 0.1)`,
                     borderColor: brandColor,
                     pointBackgroundColor: brandColor,
-                    data: [120000, 190000, 150000, 250000, 220000, 300000, 280000],
+                    data: {!! json_encode($revenues ?? [120000, 190000, 150000, 250000, 220000, 300000, 280000]) !!},
                 }]
             },
             options: {
@@ -152,9 +152,9 @@
         new Chart(document.getElementById('rolesChart'), {
             type: 'doughnut',
             data: {
-                labels: ['Customer', 'Admin', 'Cashier'],
+                labels: {!! json_encode($roles ?? ['Customer', 'Admin', 'Cashier']) !!},
                 datasets: [{
-                    data: [50, 5, 10],
+                    data: {!! json_encode($roleCounts ?? [50, 5, 10]) !!},
                     backgroundColor: [brandColor, '#36a2eb', '#ff6384'],
                     hoverOffset: 4
                 }]
@@ -175,10 +175,10 @@
         new Chart(document.getElementById('topMenusChart'), {
             type: 'bar',
             data: {
-                labels: ['Americano', 'Latte', 'Cappuccino', 'Red Velvet', 'Matcha'],
+                labels: {!! json_encode($menuNames ?? ['Americano', 'Latte', 'Cappuccino', 'Red Velvet', 'Matcha']) !!},
                 datasets: [{
                     label: 'Jumlah Terjual',
-                    data: [65, 59, 80, 81, 56],
+                    data: {!! json_encode($menuSales ?? [65, 59, 80, 81, 56]) !!},
                     backgroundColor: `rgba(${brandColorRGB}, 0.8)`,
                     borderColor: `rgba(${brandColorRGB}, 1)`,
                     borderWidth: 1

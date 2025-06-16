@@ -43,8 +43,17 @@ class OrderController extends Controller
 
     public function store(Request $request)
     {
+        // Modify the request data to set a default user_id if it's empty
+        $requestData = $request->all();
+        if (empty($requestData['user_id'])) {
+            // Find the first admin user as default
+            $adminUser = User::where('role', 'admin')->first();
+            $requestData['user_id'] = $adminUser ? $adminUser->user_id : 1; // Default to ID 1 if no admin found
+            $request->merge(['user_id' => $requestData['user_id']]);
+        }
+        
         $validatedData = $request->validate([
-            'user_id' => 'nullable|exists:users,user_id',
+            'user_id' => 'required|exists:users,user_id', // Changed from nullable to required
             'status' => [
                 'required',
                 'string',
@@ -73,8 +82,11 @@ class OrderController extends Controller
         DB::beginTransaction();
         
         try {
+            // Jika user_id kosong, gunakan ID default untuk guest order
+            $userId = !empty($validatedData['user_id']) ? $validatedData['user_id'] : 1; // Gunakan ID user default (admin)
+            
             $order = Order::create([
-                'user_id' => $validatedData['user_id'],
+                'user_id' => $userId,
                 'status' => $validatedData['status'],
                 'order_type' => $validatedData['order_type'],
                 'total_price' => $validatedData['total_price'],

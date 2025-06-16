@@ -90,7 +90,7 @@ Route::middleware('auth')->group(function () {
     // --- GRUP ADMIN (Hanya bisa diakses oleh role 'admin' atau 'cashier') ---
     Route::prefix('admin')->middleware('role:admin,cashier')->name('admin.')->group(function () {
         
-        Route::get('/dashboard', fn() => redirect()->route('admin.menus.index'))->name('dashboard');
+        Route::get('/dashboard', [PageController::class, 'dashboard'])->name('dashboard');
         Route::get('/', fn() => redirect()->route('admin.dashboard'));
         
         // Semua route resource CRUD untuk admin

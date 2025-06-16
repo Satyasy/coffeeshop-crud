@@ -27,6 +27,7 @@
                                 <option value="{{ $user->user_id }}" {{ old('user_id') == $user->user_id ? 'selected' : '' }}>{{ $user->name }} ({{ $user->email }})</option>
                             @endforeach
                         </select>
+                        <small class="form-text text-muted">Jika tidak dipilih, akan menggunakan admin sebagai default.</small>
                         @error('user_id')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
