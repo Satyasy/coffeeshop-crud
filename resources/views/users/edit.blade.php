@@ -3,12 +3,14 @@
 @section('title', 'Edit User')
 
 @section('content')
+    @include('partials.alerts')
+    
     <div class="card">
         <div class="card-header">
             <h3>Edit User: {{ $user->name }}</h3>
         </div>
         <div class="card-body">
-            <form action="{{ route('admin.users.update', $user) }}" method="POST">
+            <form action="{{ route('admin.users.update', $user->user_id) }}" method="POST">
                 @csrf
                 @method('PUT')
                 <div class="form-group mb-3">

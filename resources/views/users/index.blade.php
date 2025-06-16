@@ -3,6 +3,8 @@
 @section('title', 'Users Management')
 
 @section('content')
+    @include('partials.alerts')
+    
     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
         <h1 class="h2">Users Management</h1>
         <div class="btn-toolbar mb-2 mb-md-0">
@@ -33,9 +35,9 @@
                         </td>
                         <td>{{ $user->created_at->format('d M Y') }}</td>
                         <td>
-                            <a href="{{ route('admin.users.show', $user) }}" class="btn btn-info btn-sm">Show</a>
-                            <a href="{{ route('admin.users.edit', $user) }}" class="btn btn-warning btn-sm">Edit</a>
-                            <form action="{{ route('admin.users.destroy', $user) }}" method="POST" class="d-inline">
+                            <a href="{{ route('admin.users.show', $user->user_id) }}" class="btn btn-info btn-sm">Show</a>
+                            <a href="{{ route('admin.users.edit', $user->user_id) }}" class="btn btn-warning btn-sm">Edit</a>
+                            <form action="{{ route('admin.users.destroy', $user->user_id) }}" method="POST" class="d-inline">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="btn btn-danger btn-sm"

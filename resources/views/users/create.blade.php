@@ -3,6 +3,8 @@
 @section('title', 'Create User')
 
 @section('content')
+    @include('partials.alerts')
+    
     <div class="card">
         <div class="card-header">
             <h3>Create New User</h3>

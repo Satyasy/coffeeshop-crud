@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Payment;
 use App\Models\Order;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -26,22 +27,21 @@ class PaymentController extends Controller
         $selectedOrderId = $order->order_id;
     } else {
         // Logika lama jika membuka halaman create payment secara manual
-        $orders = Order::whereDoesntHave('payment', function ($query) {
+        $orders = Order::whereDoesntHave('payments', function ($query) {
             $query->whereIn('status', ['paid', 'pending']);
         })->orderBy('order_id', 'desc')->get();
         $selectedOrderId = null;
     }
     
-    $users = User::orderBy('name')->get();
     $statuses = Payment::getStatuses();
 
-    return view('pages.payment', compact('orders', 'users', 'statuses', 'selectedOrderId'));
+    return view('payments.create', compact('orders', 'statuses', 'selectedOrderId'));
 }
 
     public function store(Request $request)
     {
         $validatedData = $request->validate([
-            'order_id' => 'required|exists:orders,id|unique:payments,order_id',
+            'order_id' => 'required|exists:orders,order_id|unique:payments,order_id',
             'amount' => 'required|numeric|min:0',
             'payment_method' => 'required|string|max:255',
             'status' => ['required', Rule::in(['pending', 'completed', 'failed'])],
@@ -60,14 +60,14 @@ class PaymentController extends Controller
 
     public function edit(Payment $payment)
     {
-        $orders = Order::orderBy('id', 'desc')->get();
+        $orders = Order::orderBy('order_id', 'desc')->get();
         return view('payments.edit', compact('payment', 'orders'));
     }
 
     public function update(Request $request, Payment $payment)
     {
         $validatedData = $request->validate([
-            'order_id' => ['required', 'exists:orders,id', Rule::unique('payments')->ignore($payment->id)],
+            'order_id' => ['required', 'exists:orders,order_id', Rule::unique('payments')->ignore($payment->payment_id, 'payment_id')],
             'amount' => 'required|numeric|min:0',
             'payment_method' => 'required|string|max:255',
             'status' => ['required', Rule::in(['pending', 'completed', 'failed'])],

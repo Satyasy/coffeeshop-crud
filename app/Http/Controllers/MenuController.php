@@ -47,6 +47,8 @@ class MenuController extends Controller
         if ($request->hasFile('image')) {
             $path = $request->file('image')->store('menu_images', 'public');
             $data['image_url'] = $path;
+        } else {
+            $data['image_url'] = null; // Pastikan image_url diset null jika tidak ada file
         }
 
         unset($data['image']);
@@ -83,8 +85,8 @@ class MenuController extends Controller
         ]);
 
         if ($validator->fails()) {
-            // PERBAIKAN: Redirect ke 'menus.edit' (tanpa admin)
-            return redirect()->route('menus.edit', $menu->menu_id)
+            // PERBAIKAN: Redirect ke 'admin.menus.edit' (dengan admin)
+            return redirect()->route('admin.menus.edit', $menu->menu_id)
                 ->withErrors($validator)
                 ->withInput();
         }
@@ -104,18 +106,23 @@ class MenuController extends Controller
 
         $menu->update($data);
 
-        // PERBAIKAN: Redirect ke 'menus.index' (tanpa admin)
-        return redirect()->route('menus.index')->with('success', 'Menu berhasil diperbarui.');
+        // PERBAIKAN: Redirect ke 'admin.menus.index' (dengan admin)
+        return redirect()->route('admin.menus.index')->with('success', 'Menu berhasil diperbarui.');
     }
 
     public function destroy(Menu $menu)
     {
-        if ($menu->image_url && Storage::disk('public')->exists($menu->image_url)) {
-            Storage::disk('public')->delete($menu->image_url);
+        // Ambil path gambar dari database
+        $imagePath = $menu->getAttributes()['image_url'] ?? null;
+        
+        if ($imagePath && Storage::disk('public')->exists($imagePath)) {
+            Storage::disk('public')->delete($imagePath);
         }
+        
+        // Hapus menu
         $menu->delete();
 
         // PERBAIKAN: Redirect ke 'menus.index' (tanpa admin)
-        return redirect()->route('menus.index')->with('success', 'Menu berhasil dihapus.');
+        return redirect()->route('admin.menus.index')->with('success', 'Menu berhasil dihapus.');
     }
 }

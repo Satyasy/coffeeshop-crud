@@ -3,10 +3,12 @@
 @section('title', 'Show User')
 
 @section('content')
+    @include('partials.alerts')
+    
     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
         <h1 class="h2">{{ $user->name }}</h1>
         <div class="btn-toolbar mb-2 mb-md-0">
-            <a href="{{ route('admin.users.edit', $user) }}" class="btn btn-warning">Edit</a>
+            <a href="{{ route('admin.users.edit', $user->user_id) }}" class="btn btn-warning">Edit</a>
             <a href="{{ route('admin.users.index') }}" class="btn btn-secondary ml-2">Back to List</a>
         </div>
     </div>
@@ -14,7 +16,7 @@
     <div class="card">
         <div class="card-body">
             <h5 class="card-title">User Details</h5>
-            <p><strong>ID:</strong> {{ $user->id }}</p>
+            <p><strong>ID:</strong> {{ $user->user_id }}</p>
             <p><strong>Name:</strong> {{ $user->name }}</p>
             <p><strong>Email:</strong> {{ $user->email }}</p>
             <p><strong>Role:</strong> <span
@@ -40,7 +42,7 @@
                 <tbody>
                     @foreach ($user->orders as $order)
                         <tr>
-                            <td><a href="{{ route('admin.orders.show', $order) }}">#{{ $order->id }}</a></td>
+                            <td><a href="{{ route('admin.orders.show', $order) }}">#{{ $order->order_id }}</a></td>
                             <td>{{ ucfirst($order->status) }}</td>
                             <td>Rp {{ number_format($order->total_price, 0, ',', '.') }}</td>
                             <td>{{ $order->created_at->format('d M Y') }}</td>

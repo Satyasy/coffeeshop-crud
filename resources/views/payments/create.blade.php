@@ -6,7 +6,7 @@
 <div class="container-fluid">
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 class="h3 mb-0 text-gray-800">{{ $selectedOrderId ? 'Catat Pembayaran Order #' . $selectedOrderId : 'Catat Pembayaran Baru' }}</h1>
-        <a href="{{ route('payments.index', $selectedOrderId ? ['order_id' => $selectedOrderId] : []) }}" class="btn btn-secondary shadow-sm">
+        <a href="{{ route('admin.payments.index', $selectedOrderId ? ['order_id' => $selectedOrderId] : []) }}" class="btn btn-secondary shadow-sm">
             <i class="fas fa-arrow-left fa-sm text-white-50 me-1"></i> Kembali
         </a>
     </div>
@@ -18,7 +18,7 @@
             <h6 class="m-0 font-weight-bold text-primary">Formulir Pembayaran</h6>
         </div>
         <div class="card-body">
-            <form action="{{ route('payments.store') }}" method="POST" enctype="multipart/form-data">
+            <form action="{{ route('admin.payments.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="row">
                     <div class="col-md-6 mb-3">

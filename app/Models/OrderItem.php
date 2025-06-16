@@ -21,7 +21,7 @@ class OrderItem extends Model
      */
     public function order()
     {
-        return $this->belongsTo(Order::class);
+        return $this->belongsTo(Order::class, 'order_id', 'order_id');
     }
 
     /**
@@ -29,6 +29,6 @@ class OrderItem extends Model
      */
     public function menu()
     {
-        return $this->belongsTo(Menu::class);
+        return $this->belongsTo(Menu::class, 'menu_id', 'menu_id');
     }
 }

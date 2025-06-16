@@ -9,7 +9,9 @@ use Illuminate\Support\Facades\Storage;
 class Menu extends Model
 {
     use HasFactory;
-
+    
+    protected $primaryKey = 'menu_id';
+    
     protected $fillable = [
         'name',
         'description',

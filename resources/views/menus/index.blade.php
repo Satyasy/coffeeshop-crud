@@ -39,8 +39,8 @@
                                     <td>
                                         @if ($menu->image_url)
                                             {{-- Gunakan path storage yang benar --}}
-                                            <img src="{{ $menu->image_url }}" alt="{{ $menu->name }}"
-                                                width="80" class="img-thumbnail">
+                                            <img src="{{ $menu->image_url }}" alt="{{ $menu->name }}" width="80"
+                                                class="img-thumbnail">
                                         @else
                                             <span class="text-muted">No Image</span>
                                         @endif
@@ -61,12 +61,12 @@
                                             {{-- PERBAIKAN: Memberikan ID menu ke route --}}
                                             <a href="{{ route('admin.menus.edit', $menu->menu_id) }}"
                                                 class="btn btn-warning btn-sm me-1" title="Edit">
-                                                <i class="fas fa-edit"></i>
+                                                <i class="fas fa-edit"></i> Edit
                                             </a>
                                             <button type="button" class="btn btn-danger btn-sm" title="Hapus"
                                                 data-bs-toggle="modal"
                                                 data-bs-target="#deleteMenuModal-{{ $menu->menu_id }}">
-                                                <i class="fas fa-trash"></i>
+                                                <i class="fas fa-trash"></i> Hapus
                                             </button>
                                         </div>
 

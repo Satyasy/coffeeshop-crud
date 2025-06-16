@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Review;
 use App\Models\User;
 use App\Models\Menu;
+use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -16,11 +17,23 @@ class ReviewController extends Controller
         return view('reviews.index', compact('reviews'));
     }
 
-    public function create()
+    public function create(Request $request)
     {
-        $users = User::orderBy('name')->get();
-        $menus = Menu::orderBy('name')->get();
-        return view('reviews.create', compact('users', 'menus'));
+        // Cek apakah ada order_id yang dikirim dari URL
+        if ($request->has('order_id')) {
+            $order = Order::findOrFail($request->order_id);
+            $orders = collect([$order]);
+            $selectedOrderId = $order->order_id;
+        } else {
+            // Ambil order yang sudah selesai dan belum direview
+            $orders = Order::where('status', 'completed')
+                ->whereDoesntHave('reviews')
+                ->orderBy('order_id', 'desc')
+                ->get();
+            $selectedOrderId = null;
+        }
+        
+        return view('reviews.create', compact('orders', 'selectedOrderId'));
     }
 
     public function store(Request $request)

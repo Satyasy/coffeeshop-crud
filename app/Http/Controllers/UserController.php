@@ -55,7 +55,7 @@ class UserController extends Controller
     {
         $validatedData = $request->validate([
             'name' => 'required|string|max:100',
-            'email' => ['required','string','email','max:100', Rule::unique('users')->ignore($user->id, 'user_id')], // Sesuaikan dengan primary key jika kustom
+            'email' => ['required','string','email','max:100', Rule::unique('users')->ignore($user->user_id, 'user_id')], // Menggunakan user_id sebagai primary key
             'password' => ['nullable', 'confirmed', Password::defaults()],
             'phone' => ['nullable', 'string', 'max:20'],
             'address' => ['nullable', 'string'],
