@@ -15,23 +15,21 @@ class PageController extends Controller
     /**
      * Menampilkan halaman utama (home/index) dengan data testimoni/review.
      */
-// di dalam PageController.php
+    public function home()
+    {
+        // Ambil 5 review terbaru untuk testimoni
+        $reviews = Review::with('user')
+                         ->where('is_anonymous', false)
+                         ->latest()
+                         ->take(5)
+                         ->get();
 
-public function home()
-{
-    // Ambil 5 review terbaru untuk testimoni
-    $reviews = Review::with('user')
-                     ->where('is_anonymous', false)
-                     ->latest()
-                     ->take(5)
-                     ->get();
+        // Hapus pengambilan data $featuredMenus
+        // $featuredMenus = Menu::where('is_available', true)->latest()->take(4)->get();
 
-    // Hapus pengambilan data $featuredMenus
-    // $featuredMenus = Menu::where('is_available', true)->latest()->take(4)->get();
-
-    // Kirim hanya data reviews ke view
-    return view('pages.index', compact('reviews'));
-}
+        // Kirim hanya data reviews ke view
+        return view('pages.index', compact('reviews'));
+    }
 
     /**
      * Menampilkan halaman 'About'.
@@ -47,21 +45,21 @@ public function home()
      * Menampilkan halaman menu publik dengan data dari database.
      */
     public function menu()
-{
-    // Ambil semua menu yang tersedia dan kelompokkan berdasarkan kategori
-    $menus = Menu::where('is_available', true)
-                 ->latest()
-                 ->get()
-                 ->groupBy('category'); // Ini sudah benar
+    {
+        // Ambil semua menu yang tersedia dan kelompokkan berdasarkan kategori
+        $menus = Menu::where('is_available', true)
+                     ->latest()
+                     ->get()
+                     ->groupBy('category'); // Ini sudah benar
 
-    // Ambil semua kategori unik untuk membuat tombol/tab navigasi
-    $categories = Menu::where('is_available', true)
-                      ->distinct()
-                      ->pluck('category');
+        // Ambil semua kategori unik untuk membuat tombol/tab navigasi
+        $categories = Menu::where('is_available', true)
+                          ->distinct()
+                          ->pluck('category');
 
-    // Kirim kedua data ke view
-    return view('pages.menu', compact('menus', 'categories'));
-}
+        // Kirim kedua data ke view
+        return view('pages.menu', compact('menus', 'categories'));
+    }
 
     /**
      * Menampilkan halaman 'Services'.
@@ -159,6 +157,14 @@ public function home()
             $menuSales[] = $menu->total_sold;
         }
         
+        // Hitung jumlah pesanan berdasarkan status
+        $orderStatusCounts = [
+            'pending' => Order::where('status', Order::STATUS_PENDING)->count(),
+            'processing' => Order::where('status', Order::STATUS_PROCESSING)->count(),
+            'completed' => Order::where('status', Order::STATUS_COMPLETED)->count(),
+            'cancelled' => Order::where('status', Order::STATUS_CANCELLED)->count(),
+        ];
+        
         return view('admin.dashboard', compact(
             'totalUsers', 
             'totalSales', 
@@ -169,7 +175,8 @@ public function home()
             'roles',
             'roleCounts',
             'menuNames',
-            'menuSales'
+            'menuSales',
+            'orderStatusCounts'
         ));
     }
 }

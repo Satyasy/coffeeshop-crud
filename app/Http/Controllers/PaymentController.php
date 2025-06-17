@@ -18,25 +18,25 @@ class PaymentController extends Controller
     }
 
     public function create(Request $request)
-{
-    // Cek apakah ada order_id yang dikirim dari URL
-    if ($request->has('order_id')) {
-        $order = Order::findOrFail($request->order_id);
-        // Kirim hanya satu order ini ke view
-        $orders = collect([$order]);
-        $selectedOrderId = $order->order_id;
-    } else {
-        // Logika lama jika membuka halaman create payment secara manual
-        $orders = Order::whereDoesntHave('payments', function ($query) {
-            $query->whereIn('status', ['paid', 'pending']);
-        })->orderBy('order_id', 'desc')->get();
-        $selectedOrderId = null;
-    }
-    
-    $statuses = Payment::getStatuses();
+    {
+        // Cek apakah ada order_id yang dikirim dari URL
+        if ($request->has('order_id')) {
+            $order = Order::findOrFail($request->order_id);
+            // Kirim hanya satu order ini ke view
+            $orders = collect([$order]);
+            $selectedOrderId = $order->order_id;
+        } else {
+            // Logika lama jika membuka halaman create payment secara manual
+            $orders = Order::whereDoesntHave('payments', function ($query) {
+                $query->whereIn('status', ['paid', 'pending']);
+            })->orderBy('order_id', 'desc')->get();
+            $selectedOrderId = null;
+        }
+        
+        $statuses = Payment::getStatuses();
 
-    return view('payments.create', compact('orders', 'statuses', 'selectedOrderId'));
-}
+        return view('payments.create', compact('orders', 'statuses', 'selectedOrderId'));
+    }
 
     public function store(Request $request)
     {
@@ -44,10 +44,19 @@ class PaymentController extends Controller
             'order_id' => 'required|exists:orders,order_id|unique:payments,order_id',
             'amount' => 'required|numeric|min:0',
             'payment_method' => 'required|string|max:255',
-            'status' => ['required', Rule::in(['pending', 'completed', 'failed'])],
+            'status' => ['required', Rule::in(array_keys(Payment::getStatuses()))],
         ]);
 
-        Payment::create($validatedData);
+        $payment = Payment::create($validatedData);
+        
+        // Update order status jika pembayaran berhasil
+        if ($payment->status === Payment::STATUS_PAID) {
+            $order = Order::find($payment->order_id);
+            if ($order) {
+                $order->status = Order::STATUS_PROCESSING;
+                $order->save();
+            }
+        }
 
         return redirect()->route('admin.payments.index')->with('success', 'Payment record created successfully.');
     }
@@ -55,13 +64,15 @@ class PaymentController extends Controller
     public function show(Payment $payment)
     {
         $payment->load('order.user');
-        return view('payments.show', compact('payment'));
+        $statuses = Payment::getStatuses();
+        return view('payments.show', compact('payment', 'statuses'));
     }
 
     public function edit(Payment $payment)
     {
         $orders = Order::orderBy('order_id', 'desc')->get();
-        return view('payments.edit', compact('payment', 'orders'));
+        $statuses = Payment::getStatuses();
+        return view('payments.edit', compact('payment', 'orders', 'statuses'));
     }
 
     public function update(Request $request, Payment $payment)
@@ -70,10 +81,21 @@ class PaymentController extends Controller
             'order_id' => ['required', 'exists:orders,order_id', Rule::unique('payments')->ignore($payment->payment_id, 'payment_id')],
             'amount' => 'required|numeric|min:0',
             'payment_method' => 'required|string|max:255',
-            'status' => ['required', Rule::in(['pending', 'completed', 'failed'])],
+            'status' => ['required', Rule::in(array_keys(Payment::getStatuses()))],
+            'payment_time' => 'nullable|date',
         ]);
 
+        $oldStatus = $payment->status;
         $payment->update($validatedData);
+        
+        // Update order status jika pembayaran berhasil
+        if ($oldStatus !== Payment::STATUS_PAID && $payment->status === Payment::STATUS_PAID) {
+            $order = Order::find($payment->order_id);
+            if ($order) {
+                $order->status = Order::STATUS_PROCESSING;
+                $order->save();
+            }
+        }
 
         return redirect()->route('admin.payments.index')->with('success', 'Payment record updated successfully.');
     }
@@ -85,18 +107,18 @@ class PaymentController extends Controller
     }
 
     public function showPaymentPage(Order $order)
-{
-    // Pastikan order ini milik user yang sedang login (keamanan)
-    if ($order->user_id !== auth()->id()) {
-        abort(403, 'Unauthorized action.');
-    }
+    {
+        // Pastikan order ini milik user yang sedang login (keamanan)
+        if ($order->user_id !== auth()->id()) {
+            abort(403, 'Unauthorized action.');
+        }
 
-    // Pastikan order belum dibayar
-    if ($order->payment && $order->payment->status === 'paid') {
-        return redirect()->route('home')->with('info', 'Pesanan ini sudah dibayar.');
-    }
+        // Pastikan order belum dibayar
+        if ($order->payment && $order->payment->status === Payment::STATUS_PAID) {
+            return redirect()->route('home')->with('info', 'Pesanan ini sudah dibayar.');
+        }
 
-    // Kirim data order ke view
-    return view('pages.payment', compact('order'));
-}
+        // Kirim data order ke view
+        return view('pages.payment', compact('order'));
+    }
 }
